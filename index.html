@@ -726,6 +726,126 @@
     <div id="canvas-container"></div>
 
     <script>
+      // ===== SOURCE OF TRUTH =====
+      const state = {
+        H_con: 0.95, pierD: 0.30, H_ext: 0.12, X_PIVOT: -0.05, Y_MOUNT: 0.12,
+        lat: -23.7, Y_BASE: 0.095, Z_RA: 0.22, Y_DEC: 0.35, Y_CW: 0.48,
+        TUBE_LEN: 0.52, TUBE_OFF: 0.050, EYE_LEN: 0.04, TUBE_D: 0.27,
+        rW: 4.0, rD: 4.0, rH: 2.20,
+        roofOpen: 0, roofPitch: 15, roofDir: "S",
+        RA: 0, Dec: -90,
+        showFurniture: true, sofaBedOpen: false, showVolumes: true,
+        showObserver: true, observerPosture: "sitting", obsX: 1.0, obsY: 0.0,
+        skyHour: -1, skyDay: -1, panoRot: 0,
+      };
+
+      const derived = {
+        H_total: 0, TUBE_R: 0, Z_FRONT: 0, Z_BACK: 0, Z_BACK_TOTAL: 0,
+        PITCH_TAN: 0, halfSpan: 0, ridgeRise: 0, ridgeH: 0,
+        WALL_T: 0.175, hWT: 0.0875, FLOOR_ELEV: 0.20,
+        currentMaxVolZ: 0, currentMaxVolR: 0, currentEyeMinZ: 0,
+        roofTotalZ: 0,
+      };
+
+      const bindings = [
+        // Main sliders
+        { id: "paramH", key: "H_con", type: "range", valId: "valH", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramPierD", key: "pierD", type: "range", valId: "valPierD", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramExtH", key: "H_ext", type: "range", valId: "valExtH", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramPivotX", key: "X_PIVOT", type: "range", valId: "valPivotX", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramMountY", key: "Y_MOUNT", type: "range", valId: "valMountY", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramLat", key: "lat", type: "range", valId: "valLat", fmt: v => parseFloat(v).toFixed(1) + "°" },
+        { id: "paramBaseY", key: "Y_BASE", type: "range", valId: "valBaseY", fmt: v => parseFloat(v).toFixed(3) + " m" },
+        { id: "paramRaZ", key: "Z_RA", type: "range", valId: "valRaZ", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramDecY", key: "Y_DEC", type: "range", valId: "valDecY", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramCwY", key: "Y_CW", type: "range", valId: "valCwY", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramTubeLen", key: "TUBE_LEN", type: "range", valId: "valTubeLen", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramTubeOff", key: "TUBE_OFF", type: "range", valId: "valTubeOff", fmt: v => parseFloat(v).toFixed(3) + " m" },
+        { id: "paramEyeLen", key: "EYE_LEN", type: "range", valId: "valEyeLen", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramTubeD", key: "TUBE_D", type: "range", valId: "valTubeD", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomW", key: "rW", type: "range", valId: "valRoomW", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomD", key: "rD", type: "range", valId: "valRoomD", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomH", key: "rH", type: "range", valId: "valRoomH", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoofOpen", key: "roofOpen", type: "range", valId: "valRoofOpen", fmt: v => Math.round(parseFloat(v)) + "%" },
+        { id: "paramRoofPitch", key: "roofPitch", type: "range", valId: "valRoofPitch", fmt: v => Math.round(parseFloat(v)) + "°" },
+        { id: "paramRA", key: "RA", type: "range", valId: "valRA", fmt: v => Math.round(parseFloat(v)) + "°" },
+        { id: "paramDec", key: "Dec", type: "range", valId: "valDec", fmt: v => Math.round(parseFloat(v)) + "°" },
+        { id: "paramObsX", key: "obsX", type: "range" },
+        { id: "paramObsY", key: "obsY", type: "range" },
+        // Checkboxes
+        { id: "showFurniture", key: "showFurniture", type: "checkbox" },
+        { id: "sofaBedOpen", key: "sofaBedOpen", type: "checkbox" },
+        { id: "showVolumes", key: "showVolumes", type: "checkbox" },
+        { id: "showObserver", key: "showObserver", type: "checkbox" },
+        // Selects
+        { id: "paramRoofDir", key: "roofDir", type: "select", valId: "valRoofDir", fmt: v => v },
+        { id: "observerPosture", key: "observerPosture", type: "select" },
+        // Sky mirrors (same state key, different DOM element)
+        { id: "paramHSky", key: "H_con", type: "range", valId: "valHSky", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomHSky", key: "rH", type: "range", valId: "valRoomHSky", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomWSky", key: "rW", type: "range", valId: "valRoomWSky", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoomDSky", key: "rD", type: "range", valId: "valRoomDSky", fmt: v => parseFloat(v).toFixed(2) + " m" },
+        { id: "paramRoofPitchSky", key: "roofPitch", type: "range", valId: "valRoofPitchSky", fmt: v => Math.round(parseFloat(v)) + "°" },
+        { id: "paramRoofOpenSky", key: "roofOpen", type: "range", valId: "valRoofOpenSky", fmt: v => Math.round(parseFloat(v)) + "%" },
+        // Sky-only params
+        { id: "paramSkyHour", key: "skyHour", type: "range", valId: "valSkyHour", fmt: function(v) { v = parseFloat(v); if (v < 0) return "agora"; const h = Math.floor(v), m = Math.round((v-h)*60); return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0"); } },
+        { id: "paramSkyDay", key: "skyDay", type: "range", valId: "valSkyDay", fmt: function(v) { v = parseInt(v); if (v < 0) return "hoje"; const d = new Date(new Date().getFullYear(), 0, v); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0"); } },
+        { id: "paramPanoRot", key: "panoRot", type: "range", valId: "valPanoRot", fmt: v => Math.round(parseFloat(v)) + "°" },
+      ];
+
+      const LS_KEY_V2 = "observatorio_state_v2";
+
+      function syncFromDOM(binding) {
+        const el = document.getElementById(binding.id);
+        if (!el) return;
+        if (binding.type === "checkbox") state[binding.key] = el.checked;
+        else if (binding.type === "select") state[binding.key] = el.value;
+        else state[binding.key] = parseFloat(el.value);
+      }
+
+      function syncAllToDOM() {
+        for (const b of bindings) {
+          const el = document.getElementById(b.id);
+          if (!el) continue;
+          if (b.type === "checkbox") el.checked = state[b.key];
+          else el.value = state[b.key];
+          if (b.valId && b.fmt) {
+            const valEl = document.getElementById(b.valId);
+            if (valEl) valEl.innerText = b.fmt(state[b.key]);
+          }
+        }
+      }
+
+      function computeDerived() {
+        const s = state;
+        derived.H_total = s.H_con + s.H_ext + s.Y_MOUNT;
+        derived.TUBE_R = s.TUBE_D / 2;
+        derived.Z_FRONT = s.TUBE_LEN / 2 + s.TUBE_OFF;
+        derived.Z_BACK = s.TUBE_LEN / 2 - s.TUBE_OFF;
+        derived.Z_BACK_TOTAL = derived.Z_BACK + s.EYE_LEN;
+        derived.PITCH_TAN = Math.tan(s.roofPitch * Math.PI / 180);
+        const ridgeX = (s.roofDir === "N" || s.roofDir === "S");
+        derived.halfSpan = (ridgeX ? s.rD : s.rW) / 2 + 0.15;
+        derived.ridgeRise = derived.halfSpan * derived.PITCH_TAN;
+        derived.ridgeH = s.rH + derived.ridgeRise;
+      }
+
+      function saveStateToLS() {
+        localStorage.setItem(LS_KEY_V2, JSON.stringify(state));
+      }
+
+      function loadStateFromLS() {
+        const raw = localStorage.getItem(LS_KEY_V2);
+        if (!raw) return false;
+        try {
+          const data = JSON.parse(raw);
+          for (const key of Object.keys(state)) {
+            if (data[key] !== undefined) state[key] = data[key];
+          }
+          return true;
+        } catch (e) { return false; }
+      }
+
       let currentTab = "3D";
       let is2DMode = false;
 
@@ -832,72 +952,6 @@
         visualBack,
         dovetailBar;
 
-      let currentEyeMinZ = 0;
-      let currentMaxVolZ = 0;
-      let currentMaxVolR = 0;
-
-      const elH = document.getElementById("paramH");
-      const elPierD = document.getElementById("paramPierD");
-      const elExtH = document.getElementById("paramExtH");
-      const elPivotX = document.getElementById("paramPivotX");
-      const elMountY = document.getElementById("paramMountY");
-      const elLat = document.getElementById("paramLat");
-
-      const elBaseY = document.getElementById("paramBaseY");
-      const elRaZ = document.getElementById("paramRaZ");
-      const elDecY = document.getElementById("paramDecY");
-      const elCwY = document.getElementById("paramCwY");
-
-      const elTubeLen = document.getElementById("paramTubeLen");
-      const elTubeOff = document.getElementById("paramTubeOff");
-      const elEyeLen = document.getElementById("paramEyeLen");
-      const elTubeD = document.getElementById("paramTubeD");
-
-      const elRoomW = document.getElementById("paramRoomW");
-      const elRoomD = document.getElementById("paramRoomD");
-      const elRoomH = document.getElementById("paramRoomH");
-      const elRoofOpen = document.getElementById("paramRoofOpen");
-      const elRoofPitch = document.getElementById("paramRoofPitch");
-      // ridgeX derivado de elRoofDir: abre N/S → cumeeira L-O (ridgeX=true), abre L/O → cumeeira N-S
-      const elRoofDir = document.getElementById("paramRoofDir");
-      const elShowFurniture = document.getElementById("showFurniture");
-      const elSofaBedOpen = document.getElementById("sofaBedOpen");
-
-      const elRA = document.getElementById("paramRA");
-      const elDec = document.getElementById("paramDec");
-      const elShowVolumes = document.getElementById("showVolumes");
-      const elRoofOpenSky = document.getElementById("paramRoofOpenSky");
-
-      // Sliders duplicados na aba Sky
-      const skyMirrors = [
-        { sky: "paramHSky", main: elH, valSky: "valHSky", valMain: "valH", fmt: (v) => parseFloat(v).toFixed(2) + " m" },
-        { sky: "paramRoomHSky", main: elRoomH, valSky: "valRoomHSky", valMain: "valRoomH", fmt: (v) => parseFloat(v).toFixed(2) + " m" },
-        { sky: "paramRoomWSky", main: elRoomW, valSky: "valRoomWSky", valMain: "valRoomW", fmt: (v) => parseFloat(v).toFixed(2) + " m" },
-        { sky: "paramRoomDSky", main: elRoomD, valSky: "valRoomDSky", valMain: "valRoomD", fmt: (v) => parseFloat(v).toFixed(2) + " m" },
-        { sky: "paramRoofPitchSky", main: elRoofPitch, valSky: "valRoofPitchSky", valMain: "valRoofPitch", fmt: (v) => v + "°" },
-        { sky: "paramRoofOpenSky", main: elRoofOpen, valSky: "valRoofOpenSky", valMain: "valRoofOpen", fmt: (v) => Math.round(v) + "%" },
-      ];
-
-      // Sincronizar: main → sky
-      for (const m of skyMirrors) {
-        const skyEl = document.getElementById(m.sky);
-        m.main.addEventListener("input", function () {
-          skyEl.value = m.main.value;
-          document.getElementById(m.valSky).innerText = m.fmt(m.main.value);
-        });
-        // sky → main
-        skyEl.addEventListener("input", function () {
-          m.main.value = skyEl.value;
-          document.getElementById(m.valMain).innerText = m.fmt(skyEl.value);
-          updateAll();
-          saveToLocalStorage();
-        });
-      }
-
-      const elShowObs = document.getElementById("showObserver");
-      const elPosture = document.getElementById("observerPosture");
-      const elObsX = document.getElementById("paramObsX");
-      const elObsY = document.getElementById("paramObsY");
       const btnIdealPier = document.getElementById("btnIdealPier");
 
       function init() {
@@ -936,186 +990,41 @@
         createMeshes();
         createFurniture();
 
+        // Load state from v2 localStorage (falls back to defaults)
+        if (loadStateFromLS()) {
+          syncAllToDOM();
+        }
+        computeDerived();
+
         updateAll();
         switchTab("3D");
 
         window.addEventListener("resize", onWindowResize, false);
 
-        const inputs = [
-          elH,
-          elPierD,
-          elExtH,
-          elPivotX,
-          elMountY,
-          elLat,
-          elBaseY,
-          elRaZ,
-          elDecY,
-          elCwY,
-          elTubeLen,
-          elTubeOff,
-          elEyeLen,
-          elTubeD,
-          elRA,
-          elDec,
-          elRoomW,
-          elRoomD,
-          elRoomH,
-          elRoofOpen,
-          elRoofPitch,
-        ];
-
-        // --- LocalStorage: salvar e restaurar todos os parâmetros ---
-        const LS_KEY = "observatorio_params";
-        const checkboxes = [elShowFurniture, elShowVolumes, elSofaBedOpen];
-
-        function saveToLocalStorage() {
-          const data = {};
-          inputs.forEach((el) => {
-            data[el.id] = el.value;
-          });
-          checkboxes.forEach((el) => {
-            data[el.id] = el.checked;
-          });
-          // Slider sky duplicado + rotação panorama
-          data[elRoofOpenSky.id] = elRoofOpenSky.value;
-          data["paramPanoRot"] = document.getElementById("paramPanoRot").value;
-          data["paramRoofDir"] = elRoofDir.value;
-          data["paramSkyHour"] = document.getElementById("paramSkyHour").value;
-          data["paramSkyDay"] = document.getElementById("paramSkyDay").value;
-          // Postura e observador
-          const elPosture = document.getElementById("observerPosture");
-          const elShowObs = document.getElementById("showObserver");
-          const elObsX = document.getElementById("paramObsX");
-          const elObsY = document.getElementById("paramObsY");
-          if (elPosture) data[elPosture.id] = elPosture.value;
-          if (elShowObs) data[elShowObs.id] = elShowObs.checked;
-          if (elObsX) data[elObsX.id] = elObsX.value;
-          if (elObsY) data[elObsY.id] = elObsY.value;
-          localStorage.setItem(LS_KEY, JSON.stringify(data));
-        }
-
-        function loadFromLocalStorage() {
-          const raw = localStorage.getItem(LS_KEY);
-          if (!raw) return;
-          try {
-            const data = JSON.parse(raw);
-            inputs.forEach((el) => {
-              if (data[el.id] !== undefined) el.value = data[el.id];
-            });
-            checkboxes.forEach((el) => {
-              if (data[el.id] !== undefined) el.checked = data[el.id];
-            });
-            if (data[elRoofOpenSky.id] !== undefined)
-              elRoofOpenSky.value = data[elRoofOpenSky.id];
-            if (data["paramPanoRot"] !== undefined) {
-              document.getElementById("paramPanoRot").value = data["paramPanoRot"];
-              document.getElementById("valPanoRot").innerText = data["paramPanoRot"] + "°";
-            }
-            if (data["paramRoofDir"] !== undefined)
-              elRoofDir.value = data["paramRoofDir"];
-            if (data["paramSkyHour"] !== undefined) {
-              const el = document.getElementById("paramSkyHour");
-              el.value = data["paramSkyHour"];
-              const v = parseFloat(data["paramSkyHour"]);
-              if (v < 0) {
-                document.getElementById("valSkyHour").innerText = "agora";
-              } else {
-                const hh = Math.floor(v);
-                const mm = Math.round((v - hh) * 60);
-                document.getElementById("valSkyHour").innerText =
-                  String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
-              }
-            }
-            if (data["paramSkyDay"] !== undefined) {
-              const el = document.getElementById("paramSkyDay");
-              el.value = data["paramSkyDay"];
-              const v = parseInt(data["paramSkyDay"]);
-              if (v < 0) {
-                document.getElementById("valSkyDay").innerText = "hoje";
-              } else {
-                const d = new Date(new Date().getFullYear(), 0, v);
-                document.getElementById("valSkyDay").innerText =
-                  String(d.getDate()).padStart(2, "0") + "/" +
-                  String(d.getMonth() + 1).padStart(2, "0");
-              }
-            }
-            const elPosture = document.getElementById("observerPosture");
-            const elShowObs = document.getElementById("showObserver");
-            const elObsX = document.getElementById("paramObsX");
-            const elObsY = document.getElementById("paramObsY");
-            if (elPosture && data[elPosture.id] !== undefined)
-              elPosture.value = data[elPosture.id];
-            if (elShowObs && data[elShowObs.id] !== undefined)
-              elShowObs.checked = data[elShowObs.id];
-            if (elObsX && data[elObsX.id] !== undefined)
-              elObsX.value = data[elObsX.id];
-            if (elObsY && data[elObsY.id] !== undefined)
-              elObsY.value = data[elObsY.id];
-          } catch (e) {
-            // ignorar dados corrompidos
-          }
-        }
-
-        loadFromLocalStorage();
-
-        // Sincronizar sliders Sky com valores carregados
-        for (const m of skyMirrors) {
-          const skyEl = document.getElementById(m.sky);
-          skyEl.value = m.main.value;
-          document.getElementById(m.valSky).innerText = m.fmt(m.main.value);
-        }
-
-        inputs.forEach((input) => {
-          input.addEventListener("input", () => {
+        // Unified event listeners via bindings
+        for (const b of bindings) {
+          const el = document.getElementById(b.id);
+          if (!el) continue;
+          const evType = (b.type === "checkbox" || b.type === "select") ? "change" : "input";
+          el.addEventListener(evType, () => {
+            syncFromDOM(b);
+            syncAllToDOM();
+            computeDerived();
             updateAll();
-            saveToLocalStorage();
+            saveStateToLS();
           });
-        });
-
-        elShowFurniture.addEventListener("change", () => {
-          updateAll();
-          saveToLocalStorage();
-        });
-        elRoofDir.addEventListener("change", () => {
-          updateAll();
-          saveToLocalStorage();
-        });
-        elSofaBedOpen.addEventListener("change", () => {
-          updateAll();
-          saveToLocalStorage();
-        });
-
-        elShowVolumes.addEventListener("change", () => {
-          volumeMesh.visible = elShowVolumes.checked;
-          eyeVolumeMesh.visible = elShowVolumes.checked;
-          saveToLocalStorage();
-        });
-
-        elShowObs.addEventListener("change", () => {
-          updateObserver();
-          saveToLocalStorage();
-        });
-        elPosture.addEventListener("change", () => {
-          updateObserver();
-          saveToLocalStorage();
-        });
-        elObsX.addEventListener("input", () => {
-          updateObserver();
-          saveToLocalStorage();
-        });
-        elObsY.addEventListener("input", () => {
-          updateObserver();
-          saveToLocalStorage();
-        });
+        }
 
         btnIdealPier.addEventListener("click", () => {
-          const targetEyeMinZ = elPosture.value === "sitting" ? 0.65 : 1.25;
-          const diff = targetEyeMinZ - currentEyeMinZ;
-          let newH = parseFloat(elH.value) + diff;
+          const targetEyeMinZ = state.observerPosture === "sitting" ? 0.65 : 1.25;
+          const diff = targetEyeMinZ - derived.currentEyeMinZ;
+          let newH = state.H_con + diff;
           if (newH < 0.1) newH = 0.1;
-          elH.value = newH.toFixed(2);
+          state.H_con = newH;
+          syncAllToDOM();
+          computeDerived();
           updateAll();
+          saveStateToLS();
         });
 
         animate();
@@ -1732,24 +1641,24 @@
       function checkPierCrash() {
         rigGroup.updateMatrixWorld(true);
 
-        const H_con = parseFloat(elH.value);
-        const H_ext = parseFloat(elExtH.value);
-        const Y_MOUNT = parseFloat(elMountY.value);
-        const X_PIVOT = parseFloat(elPivotX.value);
-        const pierD = parseFloat(elPierD.value);
+        const H_con = state.H_con;
+        const H_ext = state.H_ext;
+        const Y_MOUNT = state.Y_MOUNT;
+        const X_PIVOT = state.X_PIVOT;
+        const pierD = state.pierD;
 
-        const TUBE_LEN = parseFloat(elTubeLen.value);
-        const TUBE_OFF = parseFloat(elTubeOff.value);
-        const EYE_LEN = parseFloat(elEyeLen.value);
+        const TUBE_LEN = state.TUBE_LEN;
+        const TUBE_OFF = state.TUBE_OFF;
+        const EYE_LEN = state.EYE_LEN;
         const Z_FRONT = TUBE_LEN / 2 + TUBE_OFF;
         const Z_BACK = TUBE_LEN / 2 - TUBE_OFF;
-        const TUBE_R = parseFloat(elTubeD.value) / 2;
+        const TUBE_R = state.TUBE_D / 2;
 
         const extR = 0.15 / 2;
         const pierR = pierD / 2;
 
-        const rW = parseFloat(elRoomW.value);
-        const rD = parseFloat(elRoomD.value);
+        const rW = state.rW;
+        const rD = state.rD;
 
         let isColliding = false;
 
@@ -1780,7 +1689,7 @@
           }
 
           // 2. Verificar Mobília (Sofá e Mesa)
-          if (currentTab === "ROOM" && elShowFurniture.checked) {
+          if (currentTab === "ROOM" && state.showFurniture) {
             // Sofá-cama (Parede Sul +Z, encostado na Leste +X)
             if (
               worldPt.y < 0.9 + radius &&
@@ -1803,8 +1712,8 @@
           return false;
         };
 
-        const Y_DEC = parseFloat(elDecY.value);
-        const Y_CW = parseFloat(elCwY.value);
+        const Y_DEC = state.Y_DEC;
+        const Y_CW = state.Y_CW;
 
         for (let t = -Z_FRONT; t <= Z_BACK + EYE_LEN; t += 0.05) {
           let r = TUBE_R;
@@ -1831,27 +1740,27 @@
       function checkRoomCrash() {
         if (currentTab !== "ROOM") return null;
 
-        const rW = parseFloat(elRoomW.value);
-        const rD = parseFloat(elRoomD.value);
-        const rH = parseFloat(elRoomH.value);
+        const rW = state.rW;
+        const rD = state.rD;
+        const rH = state.rH;
 
         const maxSafeR = Math.min(rW, rD) / 2;
-        if (currentMaxVolR > maxSafeR) return "parede";
+        if (derived.currentMaxVolR > maxSafeR) return "parede";
 
-        const openPct = parseFloat(elRoofOpen.value) / 100;
+        const openPct = state.roofOpen / 100;
 
         // Se telhado 100% aberto, só verificar paredes (sem teto)
         if (openPct >= 0.99) return null;
 
         const BEIRAL = 0.15;
-        const PITCH_TAN = Math.tan(parseFloat(elRoofPitch.value) * Math.PI / 180);
-        const dirC = elRoofDir.value;
+        const PITCH_TAN = Math.tan(state.roofPitch * Math.PI / 180);
+        const dirC = state.roofDir;
         const ridgeX = (dirC === "N" || dirC === "S"); // cumeeira L-O quando abre N/S
         const halfSpan = (ridgeX ? rD : rW) / 2 + BEIRAL;
         const ridgeRise = halfSpan * PITCH_TAN;
         const ridgeH = rH + ridgeRise;
         // Telhado desliza ao longo da cumeeira (Z)
-        const slideMax = roofTotalZ + rD;
+        const slideMax = derived.roofTotalZ + rD;
         const slideOff = -openPct * slideMax;
 
         // O telhado cobre Z de (slideOff - rD/2 - BEIRAL) a (slideOff + rD/2 + BEIRAL)
@@ -1890,7 +1799,7 @@
       const epsMat = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 1.0, transparent: true, opacity: 0.6 });
 
       function buildWallFrame(rW, rD, rH) {
-        const key = rW + "," + rD + "," + rH + "," + elPierD.value;
+        const key = rW + "," + rD + "," + rH + "," + state.pierD;
         if (key === prevWFKey) return;
         prevWFKey = key;
 
@@ -1908,7 +1817,7 @@
         const hWT = WALL_T / 2; // 0.0875 — usado em todo buildWallFrame
         const FLOOR_ELEV = 0.20; // assoalho 20cm acima da entrada
         const FLOOR_T = 0.02; // assoalho frontal 2cm
-        const pierD2 = parseFloat(elPierD.value);
+        const pierD2 = state.pierD;
         const pierClearance = pierD2 / 2 + 0.05;
 
         function addB(x, y, z, bx, by, bz, mat) {
@@ -2101,11 +2010,10 @@
       }
 
       let prevRoofKey = "";
-      let roofTotalZ = 0; // extensão real das telhas no eixo Z
       function buildRoof(rW, rD, rH) {
         const key = rW + "," + rD + "," + rH + "," +
-          currentMaxVolZ.toFixed(2) + "," + currentMaxVolR.toFixed(2) + "," +
-          elRoofPitch.value + "," + elRoofDir.value;
+          derived.currentMaxVolZ.toFixed(2) + "," + derived.currentMaxVolR.toFixed(2) + "," +
+          state.roofPitch + "," + state.roofDir;
         if (key === prevRoofKey) return;
         prevRoofKey = key;
 
@@ -2134,7 +2042,7 @@
           TILE_H = 0.04;
         const OVERLAP = 0.05,
           BEIRAL = 0.15;
-        const PITCH = (parseFloat(elRoofPitch.value) * Math.PI) / 180;
+        const PITCH = (state.roofPitch * Math.PI) / 180;
         const WHEEL_H = 0.10; // altura dos rodízios sobre o trilho
         const rHB = rH + WHEEL_H; // base real do telhado (acima dos trilhos)
 
@@ -2151,7 +2059,7 @@
         const nRidge = Math.round(ridgeLen / TILE_W) + 1; // +1 telha para beiral (meio de cada lado)
         const nSlope = Math.ceil(slopeLen / (TILE_L - OVERLAP)); // 3m tiles descendo o talude
         const totalRidge = nRidge * TILE_W;
-        roofTotalZ = totalRidge; // salvar para slide e colisão
+        derived.roofTotalZ = totalRidge; // salvar para slide e colisão
 
         // Estrutura de madeira (pinus autoclavado)
         const woodMat2 = new THREE.MeshStandardMaterial({
@@ -2334,7 +2242,7 @@
         const railMat = new THREE.MeshStandardMaterial({
           color: 0x4b5563, roughness: 0.6, metalness: 0.4,
         });
-        const slideDir = elRoofDir.value;
+        const slideDir = state.roofDir;
         // Slide ao longo de Z (N/S) ou X (L/O)
         const slideAlongZ = (slideDir === "N" || slideDir === "S");
         const slideSign = (slideDir === "N" || slideDir === "O") ? -1 : 1;
@@ -2437,70 +2345,29 @@
       });
 
       function updateAll() {
-        const H_con = parseFloat(elH.value);
-        const H_ext = parseFloat(elExtH.value);
-        const pierD = parseFloat(elPierD.value);
-        const X_PIVOT = parseFloat(elPivotX.value);
-        const Y_MOUNT = parseFloat(elMountY.value);
-        const lat = parseFloat(elLat.value);
-
-        const Y_BASE = parseFloat(elBaseY.value);
-        const Z_RA = parseFloat(elRaZ.value);
-        const Y_DEC = parseFloat(elDecY.value);
-        const Y_CW = parseFloat(elCwY.value);
-
-        const TUBE_LEN = parseFloat(elTubeLen.value);
-        const TUBE_OFF = parseFloat(elTubeOff.value);
-        const EYE_LEN = parseFloat(elEyeLen.value);
-        const TUBE_D = parseFloat(elTubeD.value);
+        // Bridge: read from state (Phase 2) — local consts used by the rest of updateAll
+        const H_con = state.H_con;
+        const H_ext = state.H_ext;
+        const Y_MOUNT = state.Y_MOUNT;
+        const X_PIVOT = state.X_PIVOT;
+        const pierD = state.pierD;
+        const lat = state.lat;
+        const Y_BASE = state.Y_BASE;
+        const Z_RA = state.Z_RA;
+        const Y_DEC = state.Y_DEC;
+        const Y_CW = state.Y_CW;
+        const TUBE_LEN = state.TUBE_LEN;
+        const TUBE_OFF = state.TUBE_OFF;
+        const EYE_LEN = state.EYE_LEN;
+        const TUBE_D = state.TUBE_D;
         const TUBE_R = TUBE_D / 2;
-
-        const rW = parseFloat(elRoomW.value);
-        const rD = parseFloat(elRoomD.value);
-        const rH = parseFloat(elRoomH.value);
+        const rW = state.rW;
+        const rD = state.rD;
+        const rH = state.rH;
 
         const Z_FRONT = TUBE_LEN / 2 + TUBE_OFF;
         const Z_BACK = TUBE_LEN / 2 - TUBE_OFF;
         const Z_BACK_TOTAL = Z_BACK + EYE_LEN;
-
-        document.getElementById("valH").innerText = H_con.toFixed(2) + " m";
-        document.getElementById("valPierD").innerText = pierD.toFixed(2) + " m";
-        document.getElementById("valExtH").innerText = H_ext.toFixed(2) + " m";
-        document.getElementById("valPivotX").innerText =
-          X_PIVOT.toFixed(2) + " m";
-        document.getElementById("valMountY").innerText =
-          Y_MOUNT.toFixed(2) + " m";
-        document.getElementById("valLat").innerText = lat.toFixed(1) + "°";
-        document.getElementById("valBaseY").innerText =
-          Y_BASE.toFixed(3) + " m";
-        document.getElementById("valRaZ").innerText = Z_RA.toFixed(2) + " m";
-        document.getElementById("valDecY").innerText = Y_DEC.toFixed(2) + " m";
-        document.getElementById("valCwY").innerText = Y_CW.toFixed(2) + " m";
-
-        document.getElementById("valTubeLen").innerText =
-          TUBE_LEN.toFixed(2) + " m";
-        document.getElementById("valTubeOff").innerText =
-          TUBE_OFF.toFixed(3) + " m";
-        document.getElementById("valEyeLen").innerText =
-          EYE_LEN.toFixed(2) + " m";
-        document.getElementById("valTubeD").innerText =
-          TUBE_D.toFixed(2) + " m";
-
-        document.getElementById("valRoomW").innerText = rW.toFixed(2) + " m";
-        document.getElementById("valRoomD").innerText = rD.toFixed(2) + " m";
-        document.getElementById("valRoomH").innerText = rH.toFixed(2) + " m";
-        document.getElementById("valRoofPitch").innerText = elRoofPitch.value + "°";
-        document.getElementById("valRoofDir").innerText = elRoofDir.value;
-
-        // Sincronizar labels e valores dos sliders Sky
-        for (const m of skyMirrors) {
-          const skyEl = document.getElementById(m.sky);
-          skyEl.value = m.main.value;
-          document.getElementById(m.valSky).innerText = m.fmt(m.main.value);
-        }
-
-        document.getElementById("valRA").innerText = elRA.value + "°";
-        document.getElementById("valDec").innerText = elDec.value + "°";
 
         const H_total = H_con + H_ext + Y_MOUNT;
 
@@ -2508,7 +2375,7 @@
 
         // Posicionar Móveis e Arquitetura contra as paredes
         furnitureGroup.visible =
-          currentTab === "ROOM" && elShowFurniture.checked;
+          currentTab === "ROOM" && state.showFurniture;
         if (archGroup) archGroup.visible = currentTab === "ROOM";
         if (wallFrameGroup) {
           wallFrameGroup.visible = currentTab === "ROOM";
@@ -2536,12 +2403,12 @@
 
         // Abrir/fechar sofá-cama
         if (sofaBedMat) {
-          sofaBedMat.visible = elSofaBedOpen.checked && elShowFurniture.checked;
+          sofaBedMat.visible = state.sofaBedOpen && state.showFurniture;
         }
 
         // Colchão no canto Sudoeste, encostado nas paredes internas Sul e Oeste
         if (mattressGroup) {
-          mattressGroup.visible = elShowFurniture.checked;
+          mattressGroup.visible = state.showFurniture;
           mattressGroup.position.set(intW2 + 0.79, flY, intS - 0.99);
         }
 
@@ -2579,9 +2446,9 @@
           //   Abre S: cumeeira L-O → rotar 90° → slide +Z
           //   Abre L: cumeeira N-S → sem rotação → slide +X (no local = +Z rotacionado)
           //   Abre O: cumeeira N-S → sem rotação → slide -X
-          const openPct = parseFloat(elRoofOpen.value) / 100;
-          const slideMax = roofTotalZ + Math.max(rW, rD);
-          const slideDir = elRoofDir.value;
+          const openPct = state.roofOpen / 100;
+          const slideMax = derived.roofTotalZ + Math.max(rW, rD);
+          const slideDir = state.roofDir;
 
           let rotY = 0, slidePosX = 0, slidePosZ = 0;
           if (slideDir === "N") {
@@ -2599,8 +2466,6 @@
           }
           roofGroup.rotation.y = rotY;
           roofGroup.position.set(slidePosX, 0, slidePosZ);
-          document.getElementById("valRoofOpen").innerText =
-            Math.round(openPct * 100) + "%";
         }
 
         // Trilhos visíveis apenas no Cômodo 3D
@@ -2656,18 +2521,22 @@
           eyeData.geometry,
         );
 
-        currentMaxVolZ = Math.max(frontData.maxZ, eyeData.maxZ);
-        currentMaxVolR = Math.max(frontData.maxRadius, eyeData.maxRadius);
+        derived.currentMaxVolZ = Math.max(frontData.maxZ, eyeData.maxZ);
+        derived.currentMaxVolR = Math.max(frontData.maxRadius, eyeData.maxRadius);
+        derived.currentEyeMinZ = eyeData.minZ;
 
         document.getElementById("outMaxZ").innerText =
-          currentMaxVolZ.toFixed(2) + " m";
+          derived.currentMaxVolZ.toFixed(2) + " m";
         document.getElementById("outMaxR").innerText =
-          currentMaxVolR.toFixed(2) + " m";
+          derived.currentMaxVolR.toFixed(2) + " m";
         document.getElementById("outMinEyeZ").innerText =
           eyeData.minZ.toFixed(2) + " m";
         document.getElementById("outMaxEyeZ").innerText =
           eyeData.maxZ.toFixed(2) + " m";
-        currentEyeMinZ = eyeData.minZ;
+
+        // Visibilidade dos volumes baseada no estado
+        volumeMesh.visible = state.showVolumes;
+        eyeVolumeMesh.visible = state.showVolumes;
 
         // Elevação mínima observável: considera a posição física do tubo
         // a RA=180° (pior caso), varrendo todas as declinações
@@ -2750,10 +2619,8 @@
         rigGroup.position.set(0, H_total, -X_PIVOT);
         tiltGroup.rotation.x = ((90 - Math.abs(lat)) * Math.PI) / 180;
 
-        raNode.rotation.z = THREE.MathUtils.degToRad(
-          parseFloat(elRA.value) + 90,
-        );
-        decNode.rotation.x = THREE.MathUtils.degToRad(-parseFloat(elDec.value));
+        raNode.rotation.z = THREE.MathUtils.degToRad(state.RA + 90);
+        decNode.rotation.x = THREE.MathUtils.degToRad(-state.Dec);
 
         baseBlock.position.set(0, -0.11, -0.06);
         baseDial.position.set(0, -0.11, -0.06);
@@ -2825,17 +2692,17 @@
         // Calcular abertura mínima segura do telhado (após geometria do volume)
         if (roofGroup && currentTab === "ROOM") {
           const BEIRAL_M = 0.15;
-          const PITCH_TAN_M = Math.tan((parseFloat(elRoofPitch.value) * Math.PI) / 180);
+          const PITCH_TAN_M = Math.tan((state.roofPitch * Math.PI) / 180);
           const halfSpanM = rW / 2 + BEIRAL_M;
           const ridgeRiseM = halfSpanM * PITCH_TAN_M;
           const ridgeHM = rH + ridgeRiseM;
-          const slideMx = roofTotalZ + rD;
+          const slideMx = derived.roofTotalZ + rD;
 
           let minSafe = 0;
           for (let test = 0; test <= 100; test++) {
             const sOff = -(test / 100) * slideMx;
-            const zMin = sOff - roofTotalZ / 2;
-            const zMax = sOff + roofTotalZ / 2;
+            const zMin = sOff - derived.roofTotalZ / 2;
+            const zMax = sOff + derived.roofTotalZ / 2;
             let hit = false;
             for (const mesh of [volumeMesh, eyeVolumeMesh]) {
               if (hit) break;
@@ -2899,19 +2766,17 @@
 
       function updateObserver() {
         observerGroup.visible =
-          document.getElementById("showObserver").checked &&
+          state.showObserver &&
           currentTab !== "2D" && currentTab !== "SKY" && currentTab !== "PROJ";
-        const scaleY = elPosture.value === "sitting" ? 0.65 : 1.0;
+        const scaleY = state.observerPosture === "sitting" ? 0.65 : 1.0;
         observerGroup.scale.set(1, scaleY, 1);
-        const posX = parseFloat(elObsX.value),
-          posY = parseFloat(elObsY.value);
+        const posX = state.obsX,
+          posY = state.obsY;
         observerGroup.position.set(posX, 0, -posY);
         document.getElementById("valObsX").innerText = posX.toFixed(1) + " m";
         document.getElementById("valObsY").innerText = posY.toFixed(1) + " m";
 
-        const limitRadius = parseFloat(
-          document.getElementById("outMaxR").innerText.replace(" m", ""),
-        );
+        const limitRadius = derived.currentMaxVolR;
         const obsMat = observerGroup.children[0].material;
         if (Math.sqrt(posX * posX + posY * posY) < limitRadius + 0.1)
           obsMat.color.setHex(0xef4444);
@@ -2949,21 +2814,21 @@
         const cy = h - 100;
         const scale = 250;
 
-        const H_con = parseFloat(elH.value);
-        const H_ext = parseFloat(elExtH.value);
-        const X_PIVOT = parseFloat(elPivotX.value);
-        const Y_MOUNT = parseFloat(elMountY.value);
-        const lat = Math.abs(parseFloat(elLat.value));
+        const H_con = state.H_con;
+        const H_ext = state.H_ext;
+        const X_PIVOT = state.X_PIVOT;
+        const Y_MOUNT = state.Y_MOUNT;
+        const lat = Math.abs(state.lat);
         const rad = (lat * Math.PI) / 180;
-        const Y_BASE = parseFloat(elBaseY.value);
-        const Z_RA = parseFloat(elRaZ.value);
-        const Y_DEC = parseFloat(elDecY.value);
-        const Y_CW = parseFloat(elCwY.value);
+        const Y_BASE = state.Y_BASE;
+        const Z_RA = state.Z_RA;
+        const Y_DEC = state.Y_DEC;
+        const Y_CW = state.Y_CW;
 
-        const TUBE_LEN = parseFloat(elTubeLen.value);
-        const TUBE_OFF = parseFloat(elTubeOff.value);
-        const EYE_LEN = parseFloat(elEyeLen.value);
-        const TUBE_D = parseFloat(elTubeD.value);
+        const TUBE_LEN = state.TUBE_LEN;
+        const TUBE_OFF = state.TUBE_OFF;
+        const EYE_LEN = state.EYE_LEN;
+        const TUBE_D = state.TUBE_D;
 
         const Z_FRONT = TUBE_LEN / 2 + TUBE_OFF;
         const Z_BACK = TUBE_LEN / 2 - TUBE_OFF;
@@ -3174,50 +3039,6 @@
         },
       );
 
-      document.getElementById("paramPanoRot").addEventListener(
-        "input",
-        function () {
-          document.getElementById("valPanoRot").innerText =
-            this.value + "°";
-          if (currentTab === "SKY") drawSky();
-          saveToLocalStorage();
-        },
-      );
-
-      document.getElementById("paramSkyHour").addEventListener(
-        "input",
-        function () {
-          const v = parseFloat(this.value);
-          if (v < 0) {
-            document.getElementById("valSkyHour").innerText = "agora";
-          } else {
-            const hh = Math.floor(v);
-            const mm = Math.round((v - hh) * 60);
-            document.getElementById("valSkyHour").innerText =
-              String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
-          }
-          if (currentTab === "SKY") drawSky();
-          saveToLocalStorage();
-        },
-      );
-
-      document.getElementById("paramSkyDay").addEventListener(
-        "input",
-        function () {
-          const v = parseInt(this.value);
-          if (v < 0) {
-            document.getElementById("valSkyDay").innerText = "hoje";
-          } else {
-            const d = new Date(new Date().getFullYear(), 0, v);
-            document.getElementById("valSkyDay").innerText =
-              String(d.getDate()).padStart(2, "0") + "/" +
-              String(d.getMonth() + 1).padStart(2, "0");
-          }
-          if (currentTab === "SKY") drawSky();
-          saveToLocalStorage();
-        },
-      );
-
       function drawSky() {
         const ctx = canvas2D.getContext("2d");
         const w = canvas2D.width;
@@ -3229,14 +3050,14 @@
         const cy = h / 2;
         const R = Math.min((w - uiWidth) / 2, h / 2) * 0.82;
 
-        const H_con = parseFloat(elH.value);
-        const H_ext = parseFloat(elExtH.value);
-        const X_PIVOT = parseFloat(elPivotX.value);
-        const Y_MOUNT = parseFloat(elMountY.value);
-        const lat = parseFloat(elLat.value);
-        const rW = parseFloat(elRoomW.value);
-        const rD = parseFloat(elRoomD.value);
-        const rH = parseFloat(elRoomH.value);
+        const H_con = state.H_con;
+        const H_ext = state.H_ext;
+        const X_PIVOT = state.X_PIVOT;
+        const Y_MOUNT = state.Y_MOUNT;
+        const lat = state.lat;
+        const rW = state.rW;
+        const rD = state.rD;
+        const rH = state.rH;
         const H_total = H_con + H_ext + Y_MOUNT;
 
         function elevToR(elev) {
@@ -3253,8 +3074,7 @@
           const pW = panoData.width;
           const pH = panoData.height;
           const pD = panoData.data;
-          const panoRot =
-            parseFloat(document.getElementById("paramPanoRot").value) || 0;
+          const panoRot = state.panoRot || 0;
           const imgData = ctx.createImageData(w, h);
           const out = imgData.data;
           const R2 = R * R;
@@ -3370,16 +3190,16 @@
 
         // Ray trace: transformar raio para o espaço local do roofGroup
         // No espaço local: cumeeira SEMPRE ao longo de Z, água desce em X
-        const roofOpen = parseFloat(elRoofOpen.value) / 100;
+        const roofOpen = state.roofOpen / 100;
         const BEIRAL_S = 0.15;
-        const PITCH_TAN_S = Math.tan((parseFloat(elRoofPitch.value) * Math.PI) / 180);
+        const PITCH_TAN_S = Math.tan((state.roofPitch * Math.PI) / 180);
         const hSpan = rW / 2 + BEIRAL_S; // local: água desce em X
         const rRise = hSpan * PITCH_TAN_S;
         const ridgeH_s = rH + rRise;
 
         // Posição e rotação do roofGroup (mesma lógica do updateAll)
-        const skyDir = elRoofDir.value;
-        const slideMx = roofTotalZ + Math.max(rW, rD);
+        const skyDir = state.roofDir;
+        const slideMx = derived.roofTotalZ + Math.max(rW, rD);
         let roofRotY = 0, roofPosX = 0, roofPosZ = 0;
         if (skyDir === "N") { roofRotY = Math.PI; roofPosZ = -roofOpen * slideMx; }
         else if (skyDir === "S") { roofRotY = 0; roofPosZ = roofOpen * slideMx; }
@@ -3389,7 +3209,7 @@
         const cosR = Math.cos(-roofRotY), sinR = Math.sin(-roofRotY);
 
         // Cobertura no espaço local
-        const localRidgeHalf = roofTotalZ / 2; // ao longo de Z local
+        const localRidgeHalf = derived.roofTotalZ / 2; // ao longo de Z local
         const localRidgeLen = rD + 2 * BEIRAL_S; // comprimento real da cumeeira
 
         // Raio do pivô: retorna "wall", "roof", ou null (céu/janela)
@@ -3470,10 +3290,10 @@
             }
 
             // Empenas (paredes verticais em z = ±localRidgeHalf local)
-            const cutWg = Math.max(currentMaxVolR * 2 + 0.2, 1.0);
+            const cutWg = Math.max(derived.currentMaxVolR * 2 + 0.2, 1.0);
             const cutHg = Math.min(
               ridgeH_s - rH - 0.08,
-              Math.max(currentMaxVolZ - rH + 0.15, (ridgeH_s - rH) * 0.65),
+              Math.max(derived.currentMaxVolZ - rH + 0.15, (ridgeH_s - rH) * 0.65),
             );
             for (const gz of [-localRidgeHalf, localRidgeHalf]) {
               if (Math.abs(ldz) < 1e-9) continue;
@@ -3498,8 +3318,8 @@
         }
 
         // Dois níveis: mais baixo (ocular mínima) e mais alto (topo do volume)
-        const eyeLow = Math.max(currentEyeMinZ, 0.5);
-        const eyeHigh = Math.max(currentMaxVolZ, H_total);
+        const eyeLow = Math.max(derived.currentEyeMinZ, 0.5);
+        const eyeHigh = Math.max(derived.currentMaxVolZ, H_total);
 
         const azRes = 360;
         const elRes = 45;
@@ -3530,12 +3350,12 @@
           }
         }
 
-        // Garantir que roofTotalZ está calculado
-        if (roofTotalZ === 0) {
+        // Garantir que derived.roofTotalZ está calculado
+        if (derived.roofTotalZ === 0) {
           const TILE_L_t = 3.0, OVERLAP_t = 0.05, BEIRAL_t = 0.15;
           const ridgeLen_t = rD + 2 * BEIRAL_t;
           const nRidge_t = Math.ceil(ridgeLen_t / (TILE_L_t - OVERLAP_t));
-          roofTotalZ = nRidge_t * TILE_L_t - (nRidge_t - 1) * OVERLAP_t;
+          derived.roofTotalZ = nRidge_t * TILE_L_t - (nRidge_t - 1) * OVERLAP_t;
         }
 
         // Renderizar nível baixo e nível alto como duas camadas independentes
@@ -3702,8 +3522,8 @@
         // LST: hora sideral local
         const now = new Date();
         const longitude = -46.6;
-        const skyHourVal = parseFloat(document.getElementById("paramSkyHour").value);
-        const skyDayVal = parseInt(document.getElementById("paramSkyDay").value);
+        const skyHourVal = state.skyHour;
+        const skyDayVal = state.skyDay;
 
         // Hora: -1 = agora, senão valor do slider (hora local)
         let utcH;
@@ -4283,16 +4103,16 @@
         ctx.fillRect(0, 0, w, h);
 
         // Read parameters
-        const H_con = parseFloat(elH.value);
-        const H_ext = parseFloat(elExtH.value);
-        const Y_MOUNT = parseFloat(elMountY.value);
-        const X_PIVOT = parseFloat(elPivotX.value);
-        const pierD = parseFloat(elPierD.value);
-        const rW = parseFloat(elRoomW.value);
-        const rD = parseFloat(elRoomD.value);
-        const rH = parseFloat(elRoomH.value);
+        const H_con = state.H_con;
+        const H_ext = state.H_ext;
+        const Y_MOUNT = state.Y_MOUNT;
+        const X_PIVOT = state.X_PIVOT;
+        const pierD = state.pierD;
+        const rW = state.rW;
+        const rD = state.rD;
+        const rH = state.rH;
         const H_total = H_con + H_ext + Y_MOUNT;
-        const pitchDeg = parseFloat(elRoofPitch.value);
+        const pitchDeg = state.roofPitch;
         const BEIRAL = 0.15;
         const PITCH_TAN = Math.tan(pitchDeg * Math.PI / 180);
         const halfSpan = rW / 2 + BEIRAL;
@@ -4555,7 +4375,7 @@
           // Layout das telhas (vista de cima, projetadas sobre a sala)
           {
             const TILE_L = 2.5, TILE_W2 = 1.0, TILE_OV = 0.05;
-            const projDir = elRoofDir.value;
+            const projDir = state.roofDir;
             const ridgeX2 = (projDir === "N" || projDir === "S");
             const ridgeLen2 = (ridgeX2 ? rW : rD) + 2 * BEIRAL;
             const halfSpan2 = (ridgeX2 ? rD : rW) / 2 + BEIRAL;
@@ -4705,7 +4525,7 @@
             const BARR_SP = 0.40;
             const nBarr = Math.ceil(rW / BARR_SP) + 1;
             const bsp = rW / (nBarr - 1);
-            const pierClr = parseFloat(elPierD.value) / 2 + 0.07;
+            const pierClr = state.pierD / 2 + 0.07;
             for (let bi = 0; bi < nBarr; bi++) {
               const bx = -rW / 2 + bi * bsp;
               if (Math.abs(bx) < pierClr) continue;
@@ -4870,8 +4690,8 @@
           ctx.fillRect(extBL.x, extTR.y, (extTR.x - extBL.x), (extBL.y - extTR.y));
 
           // Telescope envelope (simplified circle)
-          const TUBE_LEN = parseFloat(elTubeLen.value);
-          const TUBE_D = parseFloat(elTubeD.value);
+          const TUBE_LEN = state.TUBE_LEN;
+          const TUBE_D = state.TUBE_D;
           const pivotPt = toS(-X_PIVOT, H_total);
           const envR = Math.max(TUBE_LEN / 2, TUBE_D) * scale;
           ctx.strokeStyle = "rgba(59,130,246,0.3)";
@@ -4954,7 +4774,7 @@
             const BARR_H = 0.15, BARR_W = 0.05, BARR_SP = 0.40;
             const nB = Math.ceil(rW / BARR_SP) + 1;
             const bsp = rW / (nB - 1);
-            const pClr = parseFloat(elPierD.value) / 2 + 0.07;
+            const pClr = state.pierD / 2 + 0.07;
             for (let bi = 0; bi < nB; bi++) {
               const bx = -rW / 2 + bi * bsp;
               if (Math.abs(bx) < pClr) continue;
