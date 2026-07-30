@@ -1,38 +1,42 @@
-# Observatory
+# Observatório Piedade
 
-Interactive technical simulator for a private roll-off-roof observatory in
-Piedade, São Paulo.
+Simulador técnico do observatório particular em Piedade, São Paulo. O aplicativo
+combina um modelo 3D da montagem equatorial e do cômodo com plantas, cortes
+construtivos e uma carta do céu local.
 
-## Features
+Aplicação publicada: <https://mateuszitelli.github.io/observatory/>
 
-- Equatorial mount and telescope visualization
-- Configurable pier, mount, tube, room, roof, and observer geometry
-- Telescope and room 3D views
-- Dimensioned 2D plans and architectural sections
-- Local sky map with an optional 360° panorama
-- Browser-local state persistence
+## Recursos
 
-## Run locally
+- Cinemática visual da montagem equatorial, tubo e contrapesos
+- Volume varrido e avisos de colisão com paredes e telhado
+- Cômodo, mobiliário, observador e telhado deslizante
+- Planta baixa, elevações e cortes técnicos
+- Carta celeste calculada para Piedade
+- Panorama 360° substituível pelo usuário
+- Estado persistido localmente no navegador
 
-The deployed application is intentionally static and has no build step.
+## Desenvolvimento
+
+Requer Node.js 22 ou superior.
 
 ```sh
-python3 -m http.server 5173
+npm install
+npm run dev
 ```
 
-Open <http://127.0.0.1:5173/>.
+Validação completa:
 
-The page loads Tailwind CSS and Three.js from public CDNs, so an internet
-connection is required on first load. `pano360.jpg` must remain beside
-`index.html`.
+```sh
+npm run check
+npm run build
+```
 
-## Development
+O projeto usa TypeScript em modo estrito e Oxlint type-aware com zero avisos.
+Todo arquivo de texto autoral — código, configuração, documentação ou workflow —
+tem o limite rígido de 100 linhas físicas. Lockfiles e saídas geradas são excluídos.
 
-The deployable simulator lives on `main`. A strict modular TypeScript prototype
-is preserved separately on `agent/typescript-oxc-refactor` while its runtime and
-feature parity are completed.
+## Publicação
 
-## Deployment
-
-Pushes to `main` publish the static files to GitHub Pages through
-`.github/workflows/pages.yml`.
+Cada push para `main` valida, compila e publica `dist/` no GitHub Pages por meio
+do workflow `.github/workflows/pages.yml`.
