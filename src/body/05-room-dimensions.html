@@ -1,0 +1,71 @@
+      <!-- ========================================== -->
+      <!-- ABA ROOM: DIMENSÕES DO CÔMODO              -->
+      <!-- ========================================== -->
+      <div id="content-ROOM" class="hidden-content flex flex-col gap-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider mb-1">
+          Paredes e Teto do Observatório
+        </p>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-cyan-300 flex justify-between">
+            <span>Largura (Leste-Oeste)</span
+            ><span id="valRoomW" class="font-mono text-cyan-300">3.65 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramRoomW"
+            min="1.5"
+            max="6.0"
+            step="0.05"
+            value="3.65"
+            class="w-full accent-cyan-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-cyan-300 flex justify-between">
+            <span>Profundidade (Norte-Sul)</span
+            ><span id="valRoomD" class="font-mono text-cyan-300">2.80 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramRoomD"
+            min="1.5"
+            max="6.0"
+            step="0.05"
+            value="2.80"
+            class="w-full accent-cyan-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-cyan-300 flex justify-between">
+            <span>Altura do Teto</span
+            ><span id="valRoomH" class="font-mono text-cyan-300">2.20 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramRoomH"
+            min="1.5"
+            max="4.0"
+            step="0.05"
+            value="2.20"
+            class="w-full accent-cyan-500"
+          />
+        </div>
+
+        <div class="flex items-center gap-2 mt-2 border-t border-gray-700 pt-2">
+          <input
+            type="checkbox"
+            id="showFurniture"
+            checked
+            class="accent-cyan-500 w-4 h-4"
+          />
+          <label class="text-sm text-gray-300 font-bold"
+            >Mostrar Móveis (Sofá-cama e Mesa)</label
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="sofaBedOpen" class="accent-cyan-500 w-4 h-4" />
+          <label class="text-sm text-gray-300">Abrir Sofá-cama</label>
+        </div>

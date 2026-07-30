@@ -1,0 +1,95 @@
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-300 flex justify-between">
+            <span>Altura Pilar Concreto</span
+            ><span id="valH" class="font-mono text-gray-300">0.95 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramH"
+            min="0.5"
+            max="2.0"
+            step="0.01"
+            value="0.95"
+            class="w-full accent-gray-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-300 flex justify-between">
+            <span>Diâm. do Concreto</span
+            ><span id="valPierD" class="font-mono text-gray-300">0.30 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramPierD"
+            min="0.15"
+            max="0.80"
+            step="0.01"
+            value="0.30"
+            class="w-full accent-gray-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-300 flex justify-between">
+            <span>Extensão Metálica (Pier Ext.)</span
+            ><span id="valExtH" class="font-mono text-gray-300">0.12 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramExtH"
+            min="0.0"
+            max="0.6"
+            step="0.01"
+            value="0.12"
+            class="w-full accent-gray-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-red-400 flex justify-between font-bold">
+            <span>Desloc. Horiz. Base [X_PIVOT]</span
+            ><span id="valPivotX" class="font-mono text-red-400">-0.05 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramPivotX"
+            min="-0.3"
+            max="0.3"
+            step="0.01"
+            value="-0.05"
+            class="w-full accent-red-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-red-400 flex justify-between font-bold">
+            <span>Base Mount -> Eixo Verm. [Y_MOUNT]</span
+            ><span id="valMountY" class="font-mono text-red-400">0.12 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramMountY"
+            min="0.0"
+            max="0.5"
+            step="0.01"
+            value="0.12"
+            class="w-full accent-red-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-red-400 flex justify-between font-bold">
+            <span>Eixo Vermelho (Latitude)</span
+            ><span id="valLat" class="font-mono text-red-400">-23.7°</span>
+          </label>
+          <input
+            type="range"
+            id="paramLat"
+            min="-60"
+            max="0"
+            step="0.1"
+            value="-23.7"
+            class="w-full accent-red-500"
+          />
+        </div>

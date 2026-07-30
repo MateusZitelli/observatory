@@ -1,0 +1,63 @@
+
+    <canvas id="canvas-2d"></canvas>
+
+    <!-- Painel de Controlos -->
+    <div
+      id="ui-panel"
+      class="rounded-xl shadow-2xl p-5 flex flex-col gap-4 transition-all duration-300"
+    >
+      <div>
+        <h1 class="text-xl font-bold text-blue-400 pb-1">
+          Cinemática: GEM Customizada
+        </h1>
+
+        <div class="flex gap-2 mt-3 border-b border-gray-700 pb-3">
+          <button
+            id="btnTab3D"
+            class="flex-1 py-1.5 bg-blue-600 text-white text-[11px] font-bold rounded shadow transition-colors"
+          >
+            Telescópio 3D
+          </button>
+          <button
+            id="btnTabRoom"
+            class="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-[11px] font-bold rounded shadow transition-colors"
+          >
+            Cômodo 3D
+          </button>
+          <button
+            id="btnTab2D"
+            class="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-[11px] font-bold rounded shadow transition-colors"
+          >
+            Plantas 2D
+          </button>
+          <button
+            id="btnTabSky"
+            class="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-[11px] font-bold rounded shadow transition-colors"
+          >
+            Mapa do Céu
+          </button>
+          <button
+            id="btnTabProj"
+            class="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-[11px] font-bold rounded shadow transition-colors"
+          >
+            Projeto
+          </button>
+        </div>
+      </div>
+
+      <!-- ALARME DE COLISÃO -->
+      <div
+        id="collisionWarning"
+        style="display: none"
+        class="bg-red-900 border border-red-500 rounded p-2 text-center alarm-active"
+      >
+        <!-- Injetado via Javascript -->
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA 2D: MEDIDAS E EIXOS (GEOMETRIA FÍSICA) -->
+      <!-- ========================================== -->
+      <div id="content-2D" class="hidden-content flex flex-col gap-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider mb-1">
+          Dimensões Estruturais
+        </p>

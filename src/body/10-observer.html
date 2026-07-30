@@ -1,0 +1,74 @@
+      <!-- ========================================== -->
+      <!-- ABA 3D: OBSERVADOR                         -->
+      <!-- ========================================== -->
+      <div id="content-3D" class="flex flex-col gap-3">
+        <div class="border-t border-gray-600 pt-2">
+          <h2 class="text-md font-bold text-green-400 mb-2">
+            Observador Humano
+          </h2>
+
+          <div class="flex items-center gap-2 mb-3">
+            <input
+              type="checkbox"
+              id="showObserver"
+              checked
+              class="accent-green-500 w-4 h-4"
+            />
+            <label class="text-sm text-gray-300">Mostrar pessoa no local</label>
+          </div>
+
+          <div class="flex items-center gap-2 mb-3">
+            <select
+              id="observerPosture"
+              class="bg-gray-700 text-white text-sm rounded p-1 w-full border border-gray-600 focus:ring-green-500"
+            >
+              <option value="standing">Em Pé (~1.70m)</option>
+              <option value="sitting" selected>
+                Sentado em Banco (~1.15m)
+              </option>
+            </select>
+          </div>
+
+          <button
+            id="btnIdealPier"
+            class="w-full bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold py-2 px-2 rounded mb-3 transition-colors shadow-lg flex flex-col items-center"
+          >
+            <span>Auto-Ajustar Pilar Ergonómico</span>
+            <span class="text-[10px] font-normal opacity-80"
+              >(Alinha a Ocular com a cabeça)</span
+            >
+          </button>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-300 flex justify-between">
+              <span>Pessoa Eixo X</span
+              ><span id="valObsX" class="font-mono text-green-300">1.0 m</span>
+            </label>
+            <input
+              type="range"
+              id="paramObsX"
+              min="-2.0"
+              max="2.0"
+              step="0.1"
+              value="1.0"
+              class="w-full accent-green-500"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-300 flex justify-between">
+              <span>Pessoa Eixo Y</span
+              ><span id="valObsY" class="font-mono text-green-300">0.0 m</span>
+            </label>
+            <input
+              type="range"
+              id="paramObsY"
+              min="-2.0"
+              max="2.0"
+              step="0.1"
+              value="0.0"
+              class="w-full accent-green-500"
+            />
+          </div>
+        </div>
+      </div>

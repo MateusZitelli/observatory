@@ -1,0 +1,56 @@
+      <!-- ABA SKY: MAPA DO CÉU                       -->
+      <!-- ========================================== -->
+      <div id="content-SKY" class="hidden-content flex flex-col gap-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider mb-1">
+          Mapa do Céu Visível
+        </p>
+        <p class="text-xs text-gray-500 leading-tight">
+          Projeção azimutal equidistante. Zênite ao centro, horizonte na borda.
+          Vermelho = paredes. Amarelo = telhado. Claro = 1 nível. Escuro = ambos.
+        </p>
+        <p class="text-[11px] text-gray-500 uppercase tracking-wider mt-2">Observatório</p>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-gray-300 flex justify-between"><span>Altura Pilar</span><span id="valHSky" class="font-mono">0.95 m</span></label>
+          <input type="range" id="paramHSky" min="0.5" max="2.0" step="0.01" value="0.95" class="w-full accent-gray-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-gray-300 flex justify-between"><span>Altura do Teto</span><span id="valRoomHSky" class="font-mono">2.20 m</span></label>
+          <input type="range" id="paramRoomHSky" min="1.5" max="4.0" step="0.05" value="2.20" class="w-full accent-gray-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-gray-300 flex justify-between"><span>Largura (L-O)</span><span id="valRoomWSky" class="font-mono">3.65 m</span></label>
+          <input type="range" id="paramRoomWSky" min="1.5" max="6.0" step="0.05" value="3.65" class="w-full accent-gray-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-gray-300 flex justify-between"><span>Profundidade (N-S)</span><span id="valRoomDSky" class="font-mono">2.80 m</span></label>
+          <input type="range" id="paramRoomDSky" min="1.5" max="6.0" step="0.05" value="2.80" class="w-full accent-gray-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-yellow-300 flex justify-between"><span>Inclinação Águas</span><span id="valRoofPitchSky" class="font-mono text-yellow-300">15°</span></label>
+          <input type="range" id="paramRoofPitchSky" min="5" max="35" step="1" value="15" class="w-full accent-yellow-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-yellow-300 flex justify-between"><span>Abertura Telhado</span><span id="valRoofOpenSky" class="font-mono text-yellow-300">0%</span></label>
+          <input type="range" id="paramRoofOpenSky" min="0" max="100" step="1" value="0" class="w-full accent-yellow-500" />
+        </div>
+        <p class="text-[11px] text-gray-500 uppercase tracking-wider mt-2">Céu</p>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-blue-300 flex justify-between"><span>Hora Local</span><span id="valSkyHour" class="font-mono text-blue-300">agora</span></label>
+          <input type="range" id="paramSkyHour" min="-1" max="23.75" step="0.25" value="-1" class="w-full accent-blue-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] text-blue-300 flex justify-between"><span>Dia do Ano</span><span id="valSkyDay" class="font-mono text-blue-300">hoje</span></label>
+          <input type="range" id="paramSkyDay" min="-1" max="365" step="1" value="-1" class="w-full accent-blue-500" />
+        </div>
+        <div class="flex flex-col gap-1 mt-1 border-t border-gray-700 pt-2">
+          <label class="text-sm text-gray-300 text-[11px]">Panorama 360°</label>
+          <input type="file" id="panoFileInput" accept="image/*" class="text-xs text-gray-400" />
+          <div class="flex flex-col gap-1 mt-1">
+            <label class="text-sm text-gray-400 flex justify-between">
+              <span>Rotação do panorama</span>
+              <span id="valPanoRot" class="font-mono text-gray-400">0°</span>
+            </label>
+            <input type="range" id="paramPanoRot" min="0" max="360" step="1" value="0" class="w-full accent-gray-500" />
+          </div>
+        </div>
+      </div>

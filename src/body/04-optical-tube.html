@@ -1,0 +1,74 @@
+        <div class="border-t border-gray-700 my-1"></div>
+
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider mb-1">
+          Tubo Ótico
+        </p>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-200 flex justify-between">
+            <span>Comprimento do Tubo [TUBE_LEN]</span
+            ><span id="valTubeLen" class="font-mono text-gray-200">0.52 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramTubeLen"
+            min="0.2"
+            max="1.5"
+            step="0.01"
+            value="0.52"
+            class="w-full accent-gray-300"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-200 flex justify-between">
+            <span>Deslocamento na Sela [OFFSET]</span
+            ><span id="valTubeOff" class="font-mono text-gray-200"
+              >0.050 m</span
+            >
+          </label>
+          <input
+            type="range"
+            id="paramTubeOff"
+            min="-0.4"
+            max="0.4"
+            step="0.005"
+            value="0.050"
+            class="w-full accent-gray-300"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-orange-300 flex justify-between">
+            <span>Medida Ocular/Câmara [EYE_LEN]</span
+            ><span id="valEyeLen" class="font-mono text-orange-300"
+              >0.04 m</span
+            >
+          </label>
+          <input
+            type="range"
+            id="paramEyeLen"
+            min="0.0"
+            max="0.3"
+            step="0.01"
+            value="0.04"
+            class="w-full accent-orange-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-200 flex justify-between">
+            <span>Diâmetro Tubo [TUBE_D]</span
+            ><span id="valTubeD" class="font-mono text-gray-200">0.27 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramTubeD"
+            min="0.1"
+            max="0.5"
+            step="0.01"
+            value="0.27"
+            class="w-full accent-gray-300"
+          />
+        </div>
+      </div>

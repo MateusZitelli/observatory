@@ -1,0 +1,53 @@
+      <!-- MOTORES (Partilhado entre as abas 3D e Room) -->
+      <!-- ========================================== -->
+      <div id="motors-block" class="flex flex-col gap-3">
+        <div class="border-t border-gray-600 mt-1 pt-2">
+          <h2 class="text-md font-bold text-yellow-400 mb-2">
+            Movimento dos Motores
+          </h2>
+
+          <div class="flex flex-col gap-1 mb-2">
+            <label class="text-sm text-blue-300 flex justify-between">
+              <span>Motor Eixo Azul (RA)</span
+              ><span id="valRA" class="font-mono text-blue-300">0°</span>
+            </label>
+            <input
+              type="range"
+              id="paramRA"
+              min="-180"
+              max="180"
+              step="1"
+              value="0"
+              class="w-full accent-blue-500"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1 mb-2">
+            <label class="text-sm text-yellow-300 flex justify-between">
+              <span>Motor Eixo Amarelo (Dec)</span
+              ><span id="valDec" class="font-mono text-yellow-300">-90°</span>
+            </label>
+            <input
+              type="range"
+              id="paramDec"
+              min="-180"
+              max="180"
+              step="1"
+              value="-90"
+              class="w-full accent-yellow-500"
+            />
+          </div>
+
+          <div class="flex items-center gap-2 mt-1">
+            <input
+              type="checkbox"
+              id="showVolumes"
+              checked
+              class="accent-blue-500 w-4 h-4"
+            />
+            <label class="text-sm text-gray-300"
+              >Mostrar Volume "Swept" (Limites)</label
+            >
+          </div>
+        </div>
+      </div>

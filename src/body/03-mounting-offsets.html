@@ -1,0 +1,69 @@
+        <div class="border-t border-gray-700 my-1"></div>
+
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider mb-1">
+          Offsets da Montagem (GEM)
+        </p>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-red-300 flex justify-between font-bold">
+            <span>Haste da Base [Y_BASE]</span
+            ><span id="valBaseY" class="font-mono text-red-300">0.095 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramBaseY"
+            min="0.0"
+            max="0.5"
+            step="0.005"
+            value="0.095"
+            class="w-full accent-red-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-blue-400 flex justify-between font-bold">
+            <span>Eixo Azul [Z_RA]</span
+            ><span id="valRaZ" class="font-mono text-blue-400">0.22 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramRaZ"
+            min="0.05"
+            max="0.5"
+            step="0.01"
+            value="0.22"
+            class="w-full accent-blue-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-yellow-400 flex justify-between font-bold">
+            <span>Eixo Amarelo [Y_DEC]</span
+            ><span id="valDecY" class="font-mono text-yellow-400">0.35 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramDecY"
+            min="0.1"
+            max="0.6"
+            step="0.01"
+            value="0.35"
+            class="w-full accent-yellow-500"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-slate-300 flex justify-between font-bold">
+            <span>Haste Contrapeso [Y_CW]</span
+            ><span id="valCwY" class="font-mono text-slate-300">0.48 m</span>
+          </label>
+          <input
+            type="range"
+            id="paramCwY"
+            min="0.2"
+            max="1.0"
+            step="0.01"
+            value="0.48"
+            class="w-full accent-slate-500"
+          />
+        </div>

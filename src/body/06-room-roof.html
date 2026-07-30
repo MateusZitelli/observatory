@@ -1,0 +1,31 @@
+        <div class="flex flex-col gap-1 mt-2 border-t border-gray-700 pt-2">
+          <label class="text-sm text-yellow-300 flex justify-between">
+            <span>Abertura do Telhado</span>
+            <span id="valRoofOpen" class="font-mono text-yellow-300">0%</span>
+          </label>
+          <input type="range" id="paramRoofOpen" min="0" max="100" step="1" value="0" class="w-full accent-yellow-500" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-yellow-300 flex justify-between">
+            <span>Inclinação das Águas</span>
+            <span id="valRoofPitch" class="font-mono text-yellow-300">15°</span>
+          </label>
+          <input type="range" id="paramRoofPitch" min="5" max="35" step="1" value="15" class="w-full accent-yellow-500" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-yellow-300 flex justify-between">
+            <span>Abertura para</span>
+            <span id="valRoofDir" class="font-mono text-yellow-300">Norte</span>
+          </label>
+          <select id="paramRoofDir" class="bg-gray-700 text-white text-sm rounded p-1">
+            <option value="N">Norte (-Z)</option>
+            <option value="S">Sul (+Z)</option>
+            <option value="L">Leste (+X)</option>
+            <option value="O">Oeste (-X)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
