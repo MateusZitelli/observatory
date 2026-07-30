@@ -4,7 +4,7 @@ import { bodyPart3Markup } from "./body/part-3";
 import { installLegacyRuntimeGlobals } from "./runtime-compat";
 import { installInitializer } from "./runtime-init";
 import { installFurnitureGlobal } from "./scene/furniture";
-import { installSceneGlobal } from "./scene/create-meshes";
+import { installSceneGlobal, installCollisionGlobal } from "./scene/create-meshes";
 import { installKinematicGeometryGlobal } from "./scene/kinematic-geometry";
 import { installTabBindings } from "./runtime-tabs";
 import runtime from "./main.js?raw";
@@ -16,6 +16,7 @@ installLegacyRuntimeGlobals();
 installFurnitureGlobal();
 installSceneGlobal();
 installKinematicGeometryGlobal();
+installCollisionGlobal();
 installTabBindings();
 installInitializer();
 

@@ -4,6 +4,7 @@ import { createMountOptics } from "./mount-optics";
 import { createObserver } from "./create-observer";
 import { createRoom } from "./create-room";
 import { createVolumes } from "./create-volumes";
+export { installCollisionGlobal } from "./collision";
 
 function createMeshes(): void {
   const room = createRoom();
