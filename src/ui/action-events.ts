@@ -2,7 +2,7 @@ import type { Store } from "../domain/store";
 import { isViewId } from "./state-keys";
 
 export type ActionOptions = {
-  onPanorama: (source: string) => void;
+  onPanorama: (source: Blob) => void;
 };
 
 export function bindActionEvents(
@@ -55,5 +55,5 @@ function handleFile(event: Event, options: ActionOptions): void {
   const target = event.target;
   if (!(target instanceof HTMLInputElement) || target.dataset["action"] !== "panorama") return;
   const file = target.files?.item(0);
-  if (file !== null && file !== undefined) options.onPanorama(URL.createObjectURL(file));
+  if (file !== null && file !== undefined) options.onPanorama(file);
 }

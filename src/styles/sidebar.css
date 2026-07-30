@@ -3,10 +3,10 @@
   background: var(--panel);
   border-left: 1px solid var(--line);
   display: flex;
+  flex-direction: column;
   min-width: 0;
   overflow: hidden;
   position: relative;
-  transition: width 180ms ease;
   width: var(--sidebar-width);
   z-index: 3;
 }

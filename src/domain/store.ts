@@ -1,5 +1,6 @@
 import { defaultState } from "./default-state";
 import { deriveGeometry } from "./geometry";
+import { parsePersistedState } from "./state-validation";
 import type { AppSnapshot, ObservatoryState, ViewId } from "./types";
 
 type Listener = (snapshot: AppSnapshot) => void;
@@ -28,7 +29,7 @@ export function createStore(): Store {
   };
   const setState = (patch: Partial<ObservatoryState>): void => {
     state = { ...state, ...patch };
-    localStorage.setItem(storageKey, JSON.stringify(state));
+    persistState(state);
     notify();
   };
   return {
@@ -52,16 +53,20 @@ export function createStore(): Store {
 }
 
 function loadState(): ObservatoryState {
-  const saved = localStorage.getItem(storageKey);
-  if (saved === null) return { ...defaultState };
   try {
+    const saved = localStorage.getItem(storageKey);
+    if (saved === null) return { ...defaultState };
     const value: unknown = JSON.parse(saved);
-    return isRecord(value) ? { ...defaultState, ...value } : { ...defaultState };
+    return parsePersistedState(value);
   } catch {
     return { ...defaultState };
   }
 }
 
-function isRecord(value: unknown): value is Partial<ObservatoryState> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function persistState(state: ObservatoryState): void {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch (error) {
+    if (!(error instanceof DOMException)) throw error;
+  }
 }

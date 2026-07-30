@@ -1,6 +1,6 @@
 .app-shell {
   display: grid;
-  grid-template-columns: 1fr var(--sidebar-width);
+  grid-template-columns: minmax(0, 1fr) auto;
   height: 100%;
   background:
     radial-gradient(circle at 30% 20%, rgb(28 75 106 / 22%), transparent 40%),

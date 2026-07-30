@@ -2,6 +2,7 @@ import type { AppSnapshot } from "../domain/types";
 import { mountPanel } from "./panels/mount-panel";
 import { observerPanel } from "./panels/observer-panel";
 import { pierPanel } from "./panels/pier-panel";
+import { projectPanel } from "./panels/project-panel";
 import { resultsPanel } from "./panels/results-panel";
 import { roomPanel } from "./panels/room-panel";
 import { skyPanel } from "./panels/sky-panel";
@@ -30,6 +31,7 @@ export function renderShell(root: HTMLElement, snapshot: AppSnapshot): void {
           ${skyPanel(snapshot.state)}
           ${mountPanel(snapshot.state)}
           ${observerPanel(snapshot.state)}
+          ${projectPanel()}
           ${resultsPanel(snapshot.state, snapshot.geometry)}
         </div>
       </aside>

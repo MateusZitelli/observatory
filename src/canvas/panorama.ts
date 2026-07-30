@@ -10,13 +10,18 @@ export type PanoramaStore = {
 
 export function createPanoramaStore(): PanoramaStore {
   let panorama: HTMLImageElement | undefined;
+  let request = 0;
   return {
     clear: () => {
+      request += 1;
       panorama = undefined;
     },
     get: () => panorama,
     load: async (source) => {
-      panorama = await resolveImage(source);
+      const currentRequest = request + 1;
+      request = currentRequest;
+      const image = await resolveImage(source);
+      if (request === currentRequest) panorama = image;
     },
   };
 }

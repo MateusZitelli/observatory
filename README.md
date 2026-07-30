@@ -4,10 +4,6 @@ Simulador técnico do observatório particular em Piedade, São Paulo. O aplicat
 combina um modelo 3D da montagem equatorial e do cômodo com plantas, cortes
 construtivos e uma carta do céu local.
 
-> Esta branch contém o protótipo modular em TypeScript. A aplicação publicada e
-> funcional permanece na branch `main`; o bootstrap deste protótipo ainda não foi
-> integrado.
-
 ## Recursos
 
 - Cinemática visual da montagem equatorial, tubo e contrapesos
