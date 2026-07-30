@@ -1,7 +1,4 @@
-import {
-  checkRoomCrash,
-  type RoomCrashType,
-} from "./room-collision/check-room-crash";
+import { checkRoomCrash } from "./room-collision/check-room-crash";
 
 export { checkRoomCrash } from "./room-collision/check-room-crash";
 
@@ -10,5 +7,5 @@ export function installRoomCollisionGlobal(): void {
 }
 
 declare global {
-  var checkRoomCrash: () => RoomCrashType;
+  var checkRoomCrash: () => string | null;
 }

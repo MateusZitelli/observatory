@@ -14,7 +14,7 @@ export function updateMechanics(context: UpdateContext): void {
   globalThis.pierExtMesh.position.set(0, H_con, -X_PIVOT);
   globalThis.mountBaseMesh.scale.set(
     0.085,
-    Math.max(Y_MOUNT, 0.001),
+    Y_MOUNT > 0.001 && !Number.isNaN(Y_MOUNT) ? Y_MOUNT : 0.001,
     0.085,
   );
   globalThis.mountBaseMesh.position.set(0, H_con + H_ext, -X_PIVOT);
