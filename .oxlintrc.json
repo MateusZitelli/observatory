@@ -1,0 +1,55 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "style": "off",
+    "suspicious": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true,
+    "node": true
+  },
+  "ignorePatterns": ["dist/**"],
+  "options": {
+    "maxWarnings": 0,
+    "typeAware": true
+  },
+  "plugins": ["eslint", "import", "oxc", "promise", "typescript", "unicorn"],
+  "rules": {
+    "complexity": ["error", 12],
+    "eqeqeq": ["error", "always"],
+    "max-depth": ["error", 4],
+    "max-lines": ["error", {"max": 100, "skipBlankLines": false, "skipComments": false}],
+    "max-lines-per-function": ["error", {"max": 50, "skipBlankLines": true, "skipComments": true}],
+    "max-nested-callbacks": ["error", 3],
+    "max-params": ["error", 4],
+    "max-statements": ["error", 20],
+    "no-alert": "error",
+    "no-console": "error",
+    "no-else-return": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-inline-comments": "error",
+    "no-lonely-if": "error",
+    "no-duplicate-imports": "error",
+    "no-param-reassign": "error",
+    "no-restricted-globals": ["error", "event"],
+    "no-shadow": "error",
+    "no-warning-comments": "error",
+    "prefer-const": "error",
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/no-floating-promises": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-unnecessary-condition": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/strict-boolean-expressions": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+    "unicorn/filename-case": ["error", {"case": "kebabCase"}]
+  }
+}
