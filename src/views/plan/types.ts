@@ -1,0 +1,30 @@
+export type Point = { x: number; y: number };
+
+export type PlanGeometry = {
+  H_con: number;
+  H_ext: number;
+  X_PIVOT: number;
+  Y_MOUNT: number;
+  Y_BASE: number;
+  Z_RA: number;
+  Y_DEC: number;
+  Y_CW: number;
+  TUBE_LEN: number;
+  TUBE_OFF: number;
+  EYE_LEN: number;
+  TUBE_D: number;
+  pBase: Point;
+  pPivotBase: Point;
+  pExtTop: Point;
+  pPivot: Point;
+  pRaStart: Point;
+  pCross: Point;
+  pTube: Point;
+  pCW: Point;
+  pFront: Point;
+  pBack: Point;
+  pEye: Point;
+  pCenter: Point;
+  vDec: Point;
+  vRA: Point;
+};
