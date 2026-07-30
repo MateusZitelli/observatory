@@ -3,56 +3,65 @@ declare global {
   var panoCanvas: HTMLCanvasElement | null;
   var panoData: ImageData | null;
   var loadPanoImage: (src: string) => void;
-  var PANO_BASE64: string;
+}
+declare const PANO_BASE64: string;
+
+function drawingContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const context = canvas.getContext("2d");
+  if (context === null) throw new TypeError("Canvas 2D context unavailable");
+  return context;
+}
+
+function imageSource(result: string | ArrayBuffer | null): string {
+  if (typeof result === "string") return result;
+  if (result === null) return "null";
+  return Object.prototype.toString.call(result);
 }
 
 function loadPanoImage(src: string): void {
   const img = new Image();
-  img.addEventListener("load", function () {
+  Object.assign(img, { onload: function () {
     const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
     globalThis.panoImg = img;
     globalThis.panoCanvas = canvas;
-    globalThis.panoData = null;
-
-    const context = canvas.getContext("2d");
-    if (context === null) return;
+    const context = drawingContext(canvas);
     context.drawImage(img, 0, 0);
     globalThis.panoData = context.getImageData(0, 0, img.width, img.height);
     if (globalThis.currentTab === "SKY") globalThis.drawSky();
-  });
+  } });
   img.src = src;
 }
 
 function registerPanoFileInput(): void {
   const input = document.querySelector<HTMLInputElement>("#panoFileInput");
-  if (input === null) return;
-  input.addEventListener("change", function (event) {
-    const target = event.currentTarget;
-    if (!(target instanceof HTMLInputElement)) return;
-    const file = target.files?.[0];
+  if (input === null) throw new TypeError("Missing element: panoFileInput");
+  input.addEventListener("change", function (inputEvent) {
+    const target = inputEvent.target;
+    if (!(target instanceof HTMLInputElement) || target.files === null) {
+      throw new TypeError("Invalid panorama file input");
+    }
+    const file = target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.addEventListener("load", function () {
-      const result = reader.result;
-      if (typeof result !== "string") return;
+    Object.assign(reader, { onload: function (readerEvent: ProgressEvent<FileReader>) {
+      const readerTarget = readerEvent.target;
+      if (readerTarget === null) throw new TypeError("Invalid file reader");
       const img = new Image();
-      img.addEventListener("load", function () {
+      Object.assign(img, { onload: function () {
         const canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
         globalThis.panoImg = img;
         globalThis.panoCanvas = canvas;
-        globalThis.panoData = null;
-        const context = canvas.getContext("2d");
-        if (context === null) return;
+        const context = drawingContext(canvas);
         context.drawImage(img, 0, 0);
         globalThis.panoData = context.getImageData(0, 0, img.width, img.height);
         if (globalThis.currentTab === "SKY") globalThis.drawSky();
-      });
-      img.src = result;
-    });
+      } });
+      img.src = imageSource(readerTarget.result);
+    } });
     reader.readAsDataURL(file);
   });
 }
@@ -64,9 +73,10 @@ export function installPanoramaRuntime(): void {
   globalThis.loadPanoImage = loadPanoImage;
 
   const probe = new Image();
-  probe.addEventListener("load", function () { loadPanoImage("pano360.jpg"); });
-  probe.addEventListener("error", function () { loadPanoImage(globalThis.PANO_BASE64); });
+  Object.assign(probe, {
+    onload: function () { loadPanoImage("pano360.jpg"); },
+    onerror: function () { loadPanoImage(PANO_BASE64); },
+  });
   probe.src = "pano360.jpg";
-
   registerPanoFileInput();
 }
