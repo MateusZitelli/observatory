@@ -74,8 +74,8 @@ export function installPanoramaRuntime(): void {
 
   const probe = new Image();
   Object.assign(probe, {
-    onload: function () { loadPanoImage("pano360.jpg"); },
-    onerror: function () { loadPanoImage(PANO_BASE64); },
+    onload: function () { globalThis.loadPanoImage("pano360.jpg"); },
+    onerror: function () { globalThis.loadPanoImage(PANO_BASE64); },
   });
   probe.src = "pano360.jpg";
   registerPanoFileInput();
