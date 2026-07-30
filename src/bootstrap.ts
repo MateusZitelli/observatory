@@ -4,6 +4,7 @@ import { bodyPart3Markup } from "./body/part-3";
 import { installLegacyRuntimeGlobals } from "./runtime-compat";
 import { installInitializer } from "./runtime-init";
 import { installFurnitureGlobal } from "./scene/furniture";
+import { installSceneGlobal } from "./scene/create-meshes";
 import { installTabBindings } from "./runtime-tabs";
 import runtime from "./main.js?raw";
 
@@ -12,6 +13,7 @@ const bodyMarkup = [bodyPart1Markup, bodyPart2Markup, bodyPart3Markup].join("");
 document.body.innerHTML = bodyMarkup;
 installLegacyRuntimeGlobals();
 installFurnitureGlobal();
+installSceneGlobal();
 installTabBindings();
 installInitializer();
 
