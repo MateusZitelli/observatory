@@ -5,6 +5,7 @@ import { installLegacyRuntimeGlobals } from "./runtime-compat";
 import { installInitializer } from "./runtime-init";
 import { installFurnitureGlobal } from "./scene/furniture";
 import { installSceneGlobal } from "./scene/create-meshes";
+import { installKinematicGeometryGlobal } from "./scene/kinematic-geometry";
 import { installTabBindings } from "./runtime-tabs";
 import runtime from "./main.js?raw";
 
@@ -14,6 +15,7 @@ document.body.innerHTML = bodyMarkup;
 installLegacyRuntimeGlobals();
 installFurnitureGlobal();
 installSceneGlobal();
+installKinematicGeometryGlobal();
 installTabBindings();
 installInitializer();
 
