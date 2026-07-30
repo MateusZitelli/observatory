@@ -1,0 +1,40 @@
+@media (width <= 900px) {
+  :root {
+    --sidebar-width: min(360px, 48vw);
+  }
+
+  .tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 650px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    bottom: 0;
+    height: 46vh;
+    position: absolute;
+    right: 0;
+    width: 100%;
+  }
+
+  .sidebar--collapsed {
+    height: 52px;
+    width: 56px;
+  }
+
+  .sidebar__header {
+    padding: 12px 16px;
+  }
+
+  .tabs {
+    padding-inline: 16px;
+  }
+
+  .panel-scroll {
+    padding-inline: 16px;
+  }
+}
