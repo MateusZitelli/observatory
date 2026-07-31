@@ -1,4 +1,4 @@
-import type { HitType, TraceRay } from "./sky-types";
+import type { HitType, SkySnapshot, TraceRay } from "./sky-types";
 import { collectRoofHits } from "./sky-trace-roof";
 
 type RayHit = { readonly t: number; readonly type: HitType | "window" };
@@ -10,7 +10,7 @@ type TraceSetup = {
   readonly winSill: number; readonly winTop: number; readonly winHalfW: number;
   readonly hSpan: number; readonly ridgeH: number; readonly pitchTan: number;
   readonly cosR: number; readonly sinR: number; readonly ridgeHalf: number;
-  readonly roofPosX: number; readonly roofPosZ: number;
+  readonly roofPosX: number; readonly roofPosZ: number; readonly snapshot: SkySnapshot;
 };
 function calculateRoofPosition(direction: string, roofOpen: number, slideMx: number): RoofPosition {
   let roofPosX = 0;
@@ -22,10 +22,8 @@ function calculateRoofPosition(direction: string, roofOpen: number, slideMx: num
   else if (direction === "O") { roofRotY = Math.PI / 2; roofPosX = -roofOpen * slideMx; }
   return { roofPosX, roofPosZ, roofRotY };
 }
-function createTraceSetup(): TraceSetup {
-  const rD = globalThis.state.rD;
-  const rH = globalThis.state.rH;
-  const rW = globalThis.state.rW;
+function createTraceSetup(snapshot: SkySnapshot): TraceSetup {
+  const { rD, rH, rW } = snapshot;
   const roofOpen = globalThis.state.roofOpen / 100;
   const pitchTan = Math.tan((globalThis.state.roofPitch * Math.PI) / 180);
   const hSpan = rW / 2 + 0.15;
@@ -34,10 +32,10 @@ function createTraceSetup(): TraceSetup {
   const direction = globalThis.state.roofDir;
   const roof = calculateRoofPosition(direction, roofOpen, slideMx);
   return {
-    rW, rD, rH, pivotZ: -globalThis.state.X_PIVOT,
+    rW, rD, rH, pivotZ: -snapshot.X_PIVOT,
     winSill: 1.125, winTop: 2.075, winHalfW: 0.725,
     hSpan, ridgeH, pitchTan, cosR: Math.cos(-roof.roofRotY), sinR: Math.sin(-roof.roofRotY),
-    ridgeHalf: globalThis.derived.roofTotalZ / 2, roofPosX: roof.roofPosX, roofPosZ: roof.roofPosZ,
+    ridgeHalf: globalThis.derived.roofTotalZ / 2, roofPosX: roof.roofPosX, roofPosZ: roof.roofPosZ, snapshot,
   };
 }
 function wallDistance(plane: WallPlane, setup: TraceSetup): number | null {
@@ -83,6 +81,8 @@ function traceSingleRay(azRad: number, elevRad: number, originY: number, setup: 
     ldx: direction.dx * setup.cosR - direction.dz * setup.sinR,
     ldz: direction.dx * setup.sinR + direction.dz * setup.cosR, ldy: direction.dy,
     hSpan: setup.hSpan, ridgeH: setup.ridgeH, ridgeHalf: setup.ridgeHalf, pitchTan: setup.pitchTan,
+    currentMaxVolR: globalThis.derived.currentMaxVolR, currentMaxVolZ: globalThis.derived.currentMaxVolZ,
+    snapshot: setup.snapshot,
   }, hits);
   if (hits.length === 0) return null;
   hits.sort((a, b) => a.t - b.t);
@@ -90,7 +90,7 @@ function traceSingleRay(azRad: number, elevRad: number, originY: number, setup: 
   if (!firstHit || firstHit.type === "window") return null;
   return firstHit.type;
 }
-export function createSkyTracer(): TraceRay {
-  const setup = createTraceSetup();
+export function createSkyTracer(snapshot: SkySnapshot): TraceRay {
+  const setup = createTraceSetup(snapshot);
   return (azRad, elevRad, originY) => traceSingleRay(azRad, elevRad, originY, setup);
 }

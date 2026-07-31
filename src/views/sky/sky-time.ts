@@ -3,8 +3,13 @@ export type SkyTime = {
   readonly dayOfYear: number;
   readonly skyDayVal: number;
   readonly LST_deg: number;
+  readonly sinLatR: number;
+  readonly cosLatR: number;
 };
-export function calculateSkyTime(): SkyTime {
+export function calculateSkyTime(lat: number): SkyTime {
+  const latR = lat * (Math.PI / 180);
+  const sinLatR = Math.sin(latR);
+  const cosLatR = Math.cos(latR);
   const now = new Date();
   const longitude = -46.6;
   const skyHourVal = globalThis.state.skyHour;
@@ -17,10 +22,11 @@ export function calculateSkyTime(): SkyTime {
   }
   let dayOfYear: number;
   if (skyDayVal < 0) {
-    dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+    const yearStart = new Date(now.getFullYear(), 0, 0);
+    dayOfYear = Math.floor((Number(now) - Number(yearStart)) / 86400000);
   } else {
     dayOfYear = skyDayVal;
   }
   const LST_deg = (100.46 + 0.985647 * dayOfYear + longitude + utcH * 15 + 360) % 360;
-  return { now, dayOfYear, skyDayVal, LST_deg };
+  return { now, dayOfYear, skyDayVal, LST_deg, sinLatR, cosLatR };
 }

@@ -1,12 +1,12 @@
-import type { SkyFrame, TraceRay } from "./sky-types";
+import type { SkyFrame, SkySnapshot, TraceRay } from "./sky-types";
 
 export type OcclusionResult = { readonly eyeLow: number; readonly eyeHigh: number };
-function ensureRoofTotal(): void {
+export function ensureRoofTotal(rD: number): void {
   if (globalThis.derived.roofTotalZ !== 0) return;
   const beiral = 0.15;
   const overlap = 0.05;
   const tileLength = 3.0;
-  const ridgeLength = globalThis.state.rD + 2 * beiral;
+  const ridgeLength = rD + 2 * beiral;
   const ridgeCount = Math.ceil(ridgeLength / (tileLength - overlap));
   globalThis.derived.roofTotalZ = ridgeCount * tileLength - (ridgeCount - 1) * overlap;
 }
@@ -40,12 +40,12 @@ function createLayerCanvas(frame: SkyFrame): CanvasRenderingContext2D {
   if (ctx === null) throw new Error("2D canvas context unavailable");
   return ctx;
 }
-export function drawOcclusion(frame: SkyFrame, traceRay: TraceRay): OcclusionResult {
-  ensureRoofTotal();
+export function drawOcclusion(frame: SkyFrame, traceRay: TraceRay, snapshot: SkySnapshot): OcclusionResult {
+  ensureRoofTotal(snapshot.rD);
   const eyeLow = Math.max(globalThis.derived.currentEyeMinZ, 0.5);
   const eyeHigh = Math.max(globalThis.derived.currentMaxVolZ, frame.HTotal);
-  const ctxHigh = createLayerCanvas(frame);
   const ctxLow = createLayerCanvas(frame);
+  const ctxHigh = createLayerCanvas(frame);
   drawOcclusionCells({ frame, traceRay, ctxLow, ctxHigh, eyeLow, eyeHigh });
   frame.ctx.globalAlpha = 0.5; frame.ctx.drawImage(ctxLow.canvas, 0, 0); frame.ctx.drawImage(ctxHigh.canvas, 0, 0); frame.ctx.globalAlpha = 1.0;
   return { eyeLow, eyeHigh };

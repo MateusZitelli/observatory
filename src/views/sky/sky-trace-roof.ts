@@ -1,10 +1,11 @@
-import type { HitType } from "./sky-types";
+import type { HitType, SkySnapshot } from "./sky-types";
 
 type RoofRay = {
   readonly lox: number; readonly loz: number; readonly loy: number;
   readonly ldx: number; readonly ldz: number; readonly ldy: number;
   readonly hSpan: number; readonly ridgeH: number; readonly ridgeHalf: number;
-  readonly pitchTan: number;
+  readonly pitchTan: number; readonly currentMaxVolR: number; readonly currentMaxVolZ: number;
+  readonly snapshot: SkySnapshot;
 };
 type RoofHit = { readonly t: number; readonly type: HitType | "window" };
 function collectSlopeHits(ray: RoofRay, hits: RoofHit[]): void {
@@ -17,16 +18,16 @@ function collectSlopeHits(ray: RoofRay, hits: RoofHit[]): void {
     const hy = ray.loy + t * ray.ldy;
     const hz = ray.loz + t * ray.ldz;
     if (side * hx < 0 || Math.abs(hx) > ray.hSpan) continue;
-    if (hy < globalThis.state.rH || hy > ray.ridgeH) continue;
+    if (hy < ray.snapshot.rH || hy > ray.ridgeH) continue;
     if (Math.abs(hz) > ray.ridgeHalf) continue;
     hits.push({ t, type: "roof" });
   }
 }
 function collectGableHits(ray: RoofRay, hits: RoofHit[]): void {
-  const cutWg = Math.max(globalThis.derived.currentMaxVolR * 2 + 0.2, 1.0);
+  const cutWg = Math.max(ray.currentMaxVolR * 2 + 0.2, 1.0);
   const cutHg = Math.min(
-    ray.ridgeH - globalThis.state.rH - 0.08,
-    Math.max(globalThis.derived.currentMaxVolZ - globalThis.state.rH + 0.15, (ray.ridgeH - globalThis.state.rH) * 0.65),
+    ray.ridgeH - ray.snapshot.rH - 0.08,
+    Math.max(ray.currentMaxVolZ - ray.snapshot.rH + 0.15, (ray.ridgeH - ray.snapshot.rH) * 0.65),
   );
   for (const gz of [-ray.ridgeHalf, ray.ridgeHalf]) {
     if (Math.abs(ray.ldz) < 1e-9) continue;
@@ -34,10 +35,10 @@ function collectGableHits(ray: RoofRay, hits: RoofHit[]): void {
     if (t <= 0) continue;
     const hx = ray.lox + t * ray.ldx;
     const hy = ray.loy + t * ray.ldy;
-    if (hy < globalThis.state.rH || Math.abs(hx) > ray.hSpan) continue;
+    if (hy < ray.snapshot.rH || Math.abs(hx) > ray.hSpan) continue;
     const maxH = ray.ridgeH - Math.abs(hx) * ray.pitchTan;
     if (hy > maxH) continue;
-    const opening = gz > 0 && Math.abs(hx) < cutWg / 2 && hy < globalThis.state.rH + cutHg;
+    const opening = gz > 0 && Math.abs(hx) < cutWg / 2 && hy < ray.snapshot.rH + cutHg;
     if (opening) continue;
     hits.push({ t, type: "roof" });
   }

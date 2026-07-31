@@ -30,7 +30,7 @@ function drawPanoramaPixel(pixel: PanoramaPixel): void {
 }
 export function drawPanorama(frame: SkyFrame): void {
   const panoData = globalThis.panoData;
-  if (panoData === null) return;
+  if (!panoData) return;
   const imgData = frame.ctx.createImageData(frame.w, frame.h);
   const input = { pW: panoData.width, pH: panoData.height, pD: panoData.data, panoRot: globalThis.state.panoRot || 0 };
   for (let py = 0; py < frame.h; py++) {

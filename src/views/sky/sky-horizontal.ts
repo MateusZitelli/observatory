@@ -1,9 +1,6 @@
 import type { EquatorialToHorizontal } from "./sky-types";
 
-export function createHorizontalProjection(lat: number, LST_deg: number): EquatorialToHorizontal {
-  const latR = lat * (Math.PI / 180);
-  const cosLatR = Math.cos(latR);
-  const sinLatR = Math.sin(latR);
+export function createHorizontalProjection(sinLatR: number, cosLatR: number, LST_deg: number): EquatorialToHorizontal {
   return (raDeg: number, decDeg: number) => {
     const decR = (decDeg * Math.PI) / 180;
     const haR = ((LST_deg - raDeg) * Math.PI) / 180;

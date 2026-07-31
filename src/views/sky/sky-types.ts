@@ -1,4 +1,8 @@
 export type SkyPoint = { readonly x: number; readonly y: number };
+export type SkySnapshot = {
+  readonly H_con: number; readonly H_ext: number; readonly X_PIVOT: number; readonly Y_MOUNT: number;
+  readonly lat: number; readonly rW: number; readonly rD: number; readonly rH: number;
+};
 export type HitType = "wall" | "roof";
 export type TraceRay = (azRad: number, elevRad: number, originY: number) => HitType | null;
 export type SkyFrame = {

@@ -47,7 +47,8 @@ function drawObjectLabel(label: LabelInput): void {
 }
 type DeepSkyInput = { readonly frame: SkyFrame; readonly traceRay: TraceRay; readonly deepSky: readonly DeepSkyObject[]; readonly eqToHoriz: EquatorialToHorizontal; readonly moonDm: number };
 export function drawDeepSky(input: DeepSkyInput): void {
-  const objects = input.deepSky.toSorted((a, b) => b[4] - a[4]);
+  const objects = [...input.deepSky];
+  Array.prototype.sort.call(objects, (a: DeepSkyObject, b: DeepSkyObject) => b[4] - a[4]);
   for (const [name, ra, dec, type, mag, hint] of objects) {
     const pos = input.eqToHoriz(ra, dec);
     if (pos.alt < 0) continue;
