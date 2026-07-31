@@ -14,25 +14,27 @@ Piedade, São Paulo.
 
 ## Run locally
 
-The deployed application is intentionally static and has no build step.
+Install the pinned dependencies and start Vite:
 
 ```sh
-python3 -m http.server 5173
+npm ci
+npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
 Open <http://127.0.0.1:5173/>.
 
-The page loads Tailwind CSS and Three.js from public CDNs, so an internet
-connection is required on first load. `pano360.jpg` must remain beside
-`index.html`.
+Tailwind CSS and Three.js r128 are built from pinned local dependencies.
+`pano360.jpg` must remain beside `index.html`.
 
 ## Development
 
-The deployable simulator lives on `main`. A strict modular TypeScript prototype
-is preserved separately on `agent/typescript-oxc-refactor` while its runtime and
-feature parity are completed.
+Run all line-length, lint, and strict TypeScript checks with:
+
+```sh
+npm run check
+```
 
 ## Deployment
 
-Pushes to `main` publish the static files to GitHub Pages through
-`.github/workflows/pages.yml`.
+`npm run build` creates the complete static site in `dist`. Pushes to `main`
+publish that artifact to GitHub Pages through `.github/workflows/pages.yml`.

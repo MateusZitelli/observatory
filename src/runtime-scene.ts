@@ -14,6 +14,7 @@ declare module "three" {
     domElement: HTMLElement,
   ) => LegacyControls;
 }
+export type ThreeRuntime = typeof Three;
 
 declare global {
   var scene: Three.Scene;
