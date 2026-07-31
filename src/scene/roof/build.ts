@@ -7,27 +7,45 @@ import type { RoofMaterials } from "./types";
 
 let prevRoofKey = "";
 
-type GeometricObject = Three.Mesh | Three.LineSegments;
-function isGeometricObject(object: Three.Object3D): object is GeometricObject {
-  return object instanceof globalThis.THREE.Mesh || object instanceof globalThis.THREE.LineSegments;
+type RoofRailObject = Three.Object3D & { readonly userData: { readonly roofRail?: unknown } };
+type LegacyRoofObject = Three.Object3D & { readonly geometry?: unknown; readonly material?: unknown };
+function isTruthy(value: unknown): boolean {
+  return value !== false && value !== 0 && value !== 0n && value !== "" && value !== null && value !== undefined &&
+    !(typeof value === "number" && Number.isNaN(value));
+}
+function hasRoofRail(object: Three.Object3D): object is RoofRailObject {
+  return "roofRail" in object.userData && isTruthy(object.userData["roofRail"]);
+}
+function hasLegacyFields(object: Three.Object3D): object is LegacyRoofObject {
+  return "geometry" in object || "material" in object;
+}
+type Disposable = { dispose(): void };
+function isDisposable(value: object): value is Disposable {
+  return "dispose" in value && typeof value.dispose === "function";
+}
+function disposeLegacy(value: unknown): void {
+  if (value === null || (typeof value !== "object" && typeof value !== "function") || !isDisposable(value)) {
+    throw new TypeError("Value is not disposable");
+  }
+  value.dispose();
+}
+function disposeRoofGeometry(object: Three.Object3D): void {
+  if (hasLegacyFields(object) && isTruthy(object.geometry)) disposeLegacy(object.geometry);
 }
 function disposeRoofObject(object: Three.Object3D, materials: RoofMaterials): void {
-  if (!isGeometricObject(object)) return;
-  object.geometry.dispose();
-  const objectMaterial = object.material;
-  if (Array.isArray(objectMaterial)) {
-    for (const material of objectMaterial) {
-      if (material !== materials.roofMatA && material !== materials.roofMatB) material.dispose();
-    }
-  } else if (objectMaterial !== materials.roofMatA && objectMaterial !== materials.roofMatB) {
-    objectMaterial.dispose();
-  }
+  if (!hasLegacyFields(object)) return;
+  if (isTruthy(object.geometry)) disposeLegacy(object.geometry);
+  if (
+    isTruthy(object.material) &&
+    object.material !== materials.roofMatA &&
+    object.material !== materials.roofMatB
+  ) disposeLegacy(object.material);
 }
 function clearRoof(materials: RoofMaterials): void {
   for (let i = globalThis.scene.children.length - 1; i >= 0; i--) {
     const object = globalThis.scene.children[i];
-    if (object === undefined || !Object.prototype.hasOwnProperty.call(object.userData, "roofRail")) continue;
-    if (isGeometricObject(object)) object.geometry.dispose();
+    if (object === undefined || !hasRoofRail(object)) continue;
+    disposeRoofGeometry(object);
     globalThis.scene.remove(object);
   }
   while (globalThis.roofGroup.children.length > 0) {
@@ -62,16 +80,17 @@ function chooseRidgeAxis(): boolean {
 }
 
 export function buildRoof(rW: number, rD: number, rH: number): void {
-  const { currentMaxVolR, currentMaxVolZ } = globalThis.derived;
-  const { roofDir, roofPitch } = globalThis.state;
-  const key = rW + "," + rD + "," + rH + "," + currentMaxVolZ.toFixed(2) + "," + currentMaxVolR.toFixed(2) + "," + roofPitch + "," + roofDir;
+  const key = rW + "," + rD + "," + rH + "," +
+    globalThis.derived.currentMaxVolZ.toFixed(2) + "," +
+    globalThis.derived.currentMaxVolR.toFixed(2) + "," +
+    globalThis.state.roofPitch + "," + globalThis.state.roofDir;
   if (key === prevRoofKey) return;
   prevRoofKey = key;
   const roofMaterials = getRoofMaterials();
   clearRoof(roofMaterials);
-  const geometry = calculateRoofGeometry(rW, rD, rH, roofPitch);
+  const geometry = calculateRoofGeometry(rW, rD, rH, globalThis.state.roofPitch);
   globalThis.derived.roofTotalZ = geometry.totalRidge;
   buildRoofFrame(geometry, createWoodMaterials());
   buildRoofTiles({ ...geometry, overlap: 0.05, rH, PITCH: geometry.pitch }, roofMaterials);
-  buildRoofRails({ rW, rD, rH, totalRidge: geometry.totalRidge, slideDir: roofDir });
+  buildRoofRails({ rW, rD, rH, totalRidge: geometry.totalRidge, slideDir: globalThis.state.roofDir });
 }
