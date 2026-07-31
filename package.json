@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run check && vite build",
+    "build": "npm run check && vite build && cp pano360.jpg dist/pano360.jpg",
     "check": "npm run check:lines && npm run lint && npm run typecheck",
     "check:lines": "node scripts/check-lines.ts",
     "dev": "vite",
