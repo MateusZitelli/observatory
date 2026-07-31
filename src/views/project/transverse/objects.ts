@@ -1,4 +1,4 @@
-import type { SectionView } from "../types";
+import type { Point, SectionView } from "../types";
 
 function drawEnvelope(view: SectionView): void {
   const { ctx, toS, state, X_PIVOT, H_total, scale } = view;
@@ -11,7 +11,7 @@ function drawEnvelope(view: SectionView): void {
   ctx.setLineDash([]);
 }
 
-export function drawTransverseObjects(view: SectionView): void {
+export function drawTransverseObjects(view: SectionView): Point {
   const { ctx, toS, pierD, H_con, H_ext } = view;
   ctx.fillStyle = "#9ca3af"; ctx.strokeStyle = "#d1d5db"; ctx.lineWidth = 1;
   const pierBL = toS(-pierD / 2, 0), pierTR = toS(pierD / 2, H_con);
@@ -22,4 +22,5 @@ export function drawTransverseObjects(view: SectionView): void {
   const extBL = toS(-extW / 2, H_con), extTR = toS(extW / 2, H_con + H_ext);
   ctx.fillRect(extBL.x, extTR.y, extTR.x - extBL.x, extBL.y - extTR.y);
   drawEnvelope(view);
+  return pierBL;
 }

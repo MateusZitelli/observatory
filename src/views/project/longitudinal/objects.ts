@@ -1,4 +1,4 @@
-import type { SectionView } from "../types";
+import type { Point, SectionView } from "../types";
 
 function drawFoundation(view: SectionView): void {
   const { ctx, toS, pierD, H_con, H_ext } = view;
@@ -33,17 +33,18 @@ function drawWindow(view: SectionView): void {
   ctx.moveTo(winBot.x, winBot.y); ctx.lineTo(winTop.x, winTop.y); ctx.stroke();
 }
 
-function drawRail(view: SectionView): void {
+function drawRail(view: SectionView): { railStart: Point; railEnd: Point } {
   const { ctx, toS, rD, rH, slideLen } = view;
   ctx.strokeStyle = "#78716c"; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
   const railStart = toS(-rD / 2, rH);
   const railEnd = toS(-rD / 2 - slideLen, rH);
   ctx.beginPath(); ctx.moveTo(railStart.x, railStart.y); ctx.lineTo(railEnd.x, railEnd.y); ctx.stroke(); ctx.setLineDash([]);
+  return { railStart, railEnd };
 }
 
-export function drawLongitudinalObjects(view: SectionView): void {
+export function drawLongitudinalObjects(view: SectionView): { railStart: Point; railEnd: Point } {
   drawFoundation(view);
   drawPosts(view);
   drawWindow(view);
-  drawRail(view);
+  return drawRail(view);
 }

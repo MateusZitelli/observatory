@@ -15,16 +15,14 @@ type RoomPoints = {
 };
 
 function drawRoomWalls(view: PlanView): RoomPoints {
-  const { ctx, toS, ne, se, sw, rW, rD, WIN_W, DOOR_W, DOOR_OFFSET } = view;
+  const { ctx, ne, se, sw } = view;
+  const { winL, winR, doorS, doorN } = view;
   ctx.strokeStyle = "#d1d5db";
   ctx.lineWidth = 3;
   ctx.setLineDash([]);
   drawRoomCorners(view);
-  const winL = toS(-WIN_W / 2, rD / 2), winR = toS(WIN_W / 2, rD / 2);
   ctx.moveTo(sw.x, sw.y); ctx.lineTo(winL.x, winL.y);
   ctx.moveTo(winR.x, winR.y); ctx.lineTo(se.x, se.y);
-  const doorS = toS(rW / 2, -rD / 2 + DOOR_OFFSET + DOOR_W);
-  const doorN = toS(rW / 2, -rD / 2 + DOOR_OFFSET);
   ctx.moveTo(se.x, se.y); ctx.lineTo(doorS.x, doorS.y);
   ctx.moveTo(doorN.x, doorN.y); ctx.lineTo(ne.x, ne.y);
   ctx.stroke();
@@ -45,6 +43,7 @@ function drawWindow(view: PlanView, room: RoomPoints): void {
 function drawDoor(view: PlanView, room: RoomPoints): void {
   const { ctx, toS, rW, rD, DOOR_W, DOOR_OFFSET } = view;
   const { doorN, doorS } = room;
+  ctx.strokeStyle = "#38bdf8";
   ctx.lineWidth = 1.5;
   const doorPivot = doorN;
   const doorEnd = doorS;

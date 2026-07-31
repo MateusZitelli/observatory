@@ -62,8 +62,8 @@ function drawNorthArrow(view: PlanView): void {
 }
 
 export function drawProjectPlan(frame: ProjectFrame): void {
+  frame.ctx.save();
   const view = createPlanView(frame);
-  view.ctx.save();
   drawPlanRoom(view);
   drawPlanSupports(view);
   drawPlanFurniture(view);

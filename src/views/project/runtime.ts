@@ -11,9 +11,9 @@ declare global {
 
 function drawProject(): void {
   const ctx = canvas2D.getContext("2d");
-  if (ctx === null) throw new Error("2D canvas context unavailable");
   const w = canvas2D.width;
   const h = canvas2D.height;
+  if (ctx === null) throw new TypeError("2D canvas context unavailable");
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = "#0f172a";
   ctx.fillRect(0, 0, w, h);

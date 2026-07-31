@@ -25,11 +25,11 @@ function createTransverseView(frame: ProjectFrame): SectionView {
 export function drawProjectTransverse(frame: ProjectFrame): void {
   const view = createTransverseView(frame);
   view.ctx.save();
-  drawTransverseBase(view);
-  drawTransverseObjects(view);
+  const walls = drawTransverseBase(view);
+  const pierBL = drawTransverseObjects(view);
   drawTransverseSupports(view);
-  drawTransverseDimensions(view);
+  drawTransverseDimensions(view, walls, pierBL);
   drawTransverseWood(view);
-  drawTransverseLabels(view);
+  drawTransverseLabels(view, walls);
   view.ctx.restore();
 }

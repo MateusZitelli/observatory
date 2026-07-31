@@ -24,10 +24,13 @@ function createLongitudinalView(frame: ProjectFrame): SectionView {
 export function drawProjectLongitudinal(frame: ProjectFrame): void {
   const view = createLongitudinalView(frame);
   view.ctx.save();
-  drawLongitudinalBase(view);
-  drawLongitudinalObjects(view);
-  drawLongitudinalDimensions(view);
+  const walls = drawLongitudinalBase(view);
+  const rails = drawLongitudinalObjects(view);
+  drawLongitudinalDimensions(view, walls, rails);
+  view.ctx.fillStyle = "#ffffff";
+  view.ctx.font = "bold 12px sans-serif";
+  view.ctx.textAlign = "center";
   drawLongitudinalWood(view);
-  drawLongitudinalLabels(view);
+  drawLongitudinalLabels(view, walls);
   view.ctx.restore();
 }

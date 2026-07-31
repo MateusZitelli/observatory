@@ -9,8 +9,10 @@ function drawGround(view: SectionView): void {
   ctx.moveTo(gl.x, gl.y); ctx.lineTo(gr.x, gr.y); ctx.stroke(); ctx.setLineDash([]);
 }
 
-type TransverseWalls = {
+export type TransverseWalls = {
+  wallBL: ReturnType<SectionView["toS"]>;
   wallTL: ReturnType<SectionView["toS"]>;
+  wallBR: ReturnType<SectionView["toS"]>;
   wallTR: ReturnType<SectionView["toS"]>;
 };
 
@@ -23,7 +25,7 @@ function drawWalls(view: SectionView): TransverseWalls {
   ctx.moveTo(wallBL.x, wallBL.y); ctx.lineTo(wallTL.x, wallTL.y);
   ctx.moveTo(wallBR.x, wallBR.y); ctx.lineTo(wallTR.x, wallTR.y); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(wallBL.x, wallBL.y); ctx.lineTo(wallBR.x, wallBR.y); ctx.stroke();
-  return { wallTL, wallTR };
+  return { wallBL, wallTL, wallBR, wallTR };
 }
 
 function drawRoof(view: SectionView, walls: TransverseWalls): void {
@@ -68,9 +70,10 @@ function drawTiles(view: SectionView): void {
   drawTileSide(view, 1);
 }
 
-export function drawTransverseBase(view: SectionView): void {
+export function drawTransverseBase(view: SectionView): TransverseWalls {
   drawGround(view);
   const walls = drawWalls(view);
   drawRoof(view, walls);
   drawTiles(view);
+  return walls;
 }

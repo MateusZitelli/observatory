@@ -7,8 +7,10 @@ function drawGround(view: SectionView): void {
   ctx.beginPath(); ctx.moveTo(glNS.x, glNS.y); ctx.lineTo(grNS.x, grNS.y); ctx.stroke(); ctx.setLineDash([]);
 }
 
-type LongitudinalWalls = {
+export type LongitudinalWalls = {
+  wallN_B: ReturnType<SectionView["toS"]>;
   wallN_T: ReturnType<SectionView["toS"]>;
+  wallS_B: ReturnType<SectionView["toS"]>;
   wallS_T: ReturnType<SectionView["toS"]>;
 };
 
@@ -21,7 +23,7 @@ function drawWalls(view: SectionView): LongitudinalWalls {
   ctx.moveTo(wallN_B.x, wallN_B.y); ctx.lineTo(wallN_T.x, wallN_T.y);
   ctx.moveTo(wallS_B.x, wallS_B.y); ctx.lineTo(wallS_T.x, wallS_T.y); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(wallN_B.x, wallN_B.y); ctx.lineTo(wallS_B.x, wallS_B.y); ctx.stroke();
-  return { wallN_T, wallS_T };
+  return { wallN_B, wallN_T, wallS_B, wallS_T };
 }
 
 function drawRoof(view: SectionView, walls: LongitudinalWalls): void {
@@ -44,9 +46,10 @@ function drawEaves(view: SectionView, walls: LongitudinalWalls): void {
   ctx.moveTo(eaveS.x, eaveS.y); ctx.lineTo(wallS_T.x, wallS_T.y); ctx.stroke();
 }
 
-export function drawLongitudinalBase(view: SectionView): void {
+export function drawLongitudinalBase(view: SectionView): LongitudinalWalls {
   drawGround(view);
   const walls = drawWalls(view);
   drawRoof(view, walls);
   drawEaves(view, walls);
+  return walls;
 }

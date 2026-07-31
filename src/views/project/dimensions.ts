@@ -9,9 +9,8 @@ type Dimension = {
   readonly offset: number;
 };
 
-function drawDimensionGeometry(ctx: CanvasRenderingContext2D, d: Dimension): void {
+function drawDimensionGeometry(ctx: CanvasRenderingContext2D, d: Dimension, len: number): void {
   const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
   const nx = -dy / len * d.offset, ny = dx / len * d.offset;
   ctx.beginPath();
   ctx.moveTo(d.x1, d.y1); ctx.lineTo(d.x1 + nx, d.y1 + ny);
@@ -23,9 +22,8 @@ function drawDimensionGeometry(ctx: CanvasRenderingContext2D, d: Dimension): voi
   ctx.moveTo(d.x2 + nx - tx, d.y2 + ny - ty); ctx.lineTo(d.x2 + nx + tx, d.y2 + ny + ty); ctx.stroke();
 }
 
-function drawDimensionLabel(ctx: CanvasRenderingContext2D, d: Dimension): void {
+function drawDimensionLabel(ctx: CanvasRenderingContext2D, d: Dimension, len: number): void {
   const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
   const nx = -dy / len * d.offset, ny = dx / len * d.offset;
   ctx.fillStyle = "#94a3b8";
   ctx.font = "11px sans-serif";
@@ -40,6 +38,6 @@ export function drawDimLine(frame: ProjectFrame, d: Dimension): void {
   frame.ctx.strokeStyle = "#94a3b8";
   frame.ctx.lineWidth = 1;
   frame.ctx.setLineDash([]);
-  drawDimensionGeometry(frame.ctx, d);
-  drawDimensionLabel(frame.ctx, d);
+  drawDimensionGeometry(frame.ctx, d, len);
+  drawDimensionLabel(frame.ctx, d, len);
 }

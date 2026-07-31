@@ -7,14 +7,12 @@ function drawSupportPosts(view: PlanView): void {
   ctx.lineWidth = 1.5;
   const postSize = 0.12;
   const railW2 = rW / 2 + 0.04;
-  const postPositions = [
+  const postPositions: [number, number][] = [
     [-railW2, -rD / 2], [railW2, -rD / 2],
     [-railW2, -rD / 2 - slideLen], [railW2, -rD / 2 - slideLen],
     [-railW2, -rD / 2 - slideLen / 2], [railW2, -rD / 2 - slideLen / 2],
   ];
-  for (const pp of postPositions) {
-    const [px, py] = pp;
-    if (px === undefined || py === undefined) continue;
+  for (const [px, py] of postPositions) {
     const pt = toS(px, py);
     ctx.fillRect(
       pt.x - postSize * scale / 2, pt.y - postSize * scale / 2,
