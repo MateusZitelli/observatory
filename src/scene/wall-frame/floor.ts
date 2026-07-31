@@ -24,7 +24,7 @@ export function buildFloor({ rW, rD, pierClearance, addBox, materials }: WallFra
     if (Math.abs(bx) < pierClearance) continue;
     addBox({
       x: bx, y: FLOOR_ELEV - BARR_H / 2 - FLOOR_T, z: 0,
-      width: BARR_W, height: BARR_H, depth: rD, material: floorMat,
+      width: BARR_W, height: BARR_H, depth: rD,
     });
   }
   buildFloorSurface({ rW, rD, pierClearance, addBox, floorMat: frontalMat });
