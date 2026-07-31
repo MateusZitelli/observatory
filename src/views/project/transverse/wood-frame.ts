@@ -1,7 +1,7 @@
 import type { SectionView } from "../types";
 
-export function drawTransverseFrame(view: SectionView): void {
-  const { ctx, toS, state, rW, rH, scale } = view;
+function drawFrameWalls(view: SectionView): void {
+  const { ctx, toS, rW, rH, scale } = view;
   const D = 0.09, S = 0.045, wfCol = "rgba(196, 163, 90, 0.6)";
   for (const sx of [-1, 1]) {
     const wx = sx * rW / 2;
@@ -17,17 +17,36 @@ export function drawTransverseFrame(view: SectionView): void {
     const mBot = toS(wx, S), mTop = toS(wx, rH - S * 2);
     ctx.beginPath(); ctx.moveTo(mBot.x, mBot.y); ctx.lineTo(mTop.x, mTop.y); ctx.stroke();
   }
-  ctx.fillStyle = "rgba(184, 148, 62, 0.4)";
+}
+
+function drawFrameBarriers(view: SectionView): void {
+  const { ctx, toS, state, rW, scale } = view;
   const BARR_H = 0.15, BARR_SP = 0.40, BARR_W = 0.05;
-  const nB = Math.ceil(rW / BARR_SP) + 1, bsp = rW / (nB - 1);
+  const nB = Math.ceil(rW / BARR_SP) + 1;
+  const bsp = rW / (nB - 1);
   const pClr = state.pierD / 2 + 0.07;
+  ctx.fillStyle = "rgba(184, 148, 62, 0.4)";
   for (let bi = 0; bi < nB; bi++) {
     const bx = -rW / 2 + bi * bsp;
     if (Math.abs(bx) < pClr) continue;
-    const p = toS(bx, 0), pw = Math.max(1, BARR_W * scale), ph = BARR_H * scale;
+    const p = toS(bx, 0);
+    const pw = Math.max(1, BARR_W * scale);
+    const ph = BARR_H * scale;
     ctx.fillRect(p.x - pw / 2, p.y, pw, ph);
   }
+}
+
+function drawFrameVertical(view: SectionView): void {
+  const { ctx, toS, rW } = view;
   ctx.fillStyle = "rgba(184, 148, 62, 0.5)";
-  const vBot = toS(0, -0.20), vTop = toS(0, 0), vH = vTop.y - vBot.y;
+  const vBot = toS(0, -0.20);
+  const vTop = toS(0, 0);
+  const vH = vTop.y - vBot.y;
   ctx.fillRect(toS(-rW / 2, 0).x, vBot.y, toS(rW / 2, 0).x - toS(-rW / 2, 0).x, -vH);
+}
+
+export function drawTransverseFrame(view: SectionView): void {
+  drawFrameWalls(view);
+  drawFrameBarriers(view);
+  drawFrameVertical(view);
 }

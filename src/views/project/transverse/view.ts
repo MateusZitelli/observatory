@@ -8,12 +8,16 @@ import type { ProjectFrame, SectionView } from "../types";
 
 function createTransverseView(frame: ProjectFrame): SectionView {
   const { uiWidth, availW, availH, PAD, rW, BEIRAL, roofPeakH } = frame;
-  const vpX = uiWidth + availW / 2, vpW = availW / 2, vpH = availH / 2;
-  const totalSecW = rW + BEIRAL * 2 + 0.6, totalSecH = roofPeakH + 0.8;
+  const vpX = uiWidth + availW / 2;
+  const vpW = availW / 2;
+  const vpH = availH / 2;
+  const totalSecW = rW + BEIRAL * 2 + 0.6;
+  const totalSecH = roofPeakH + 0.8;
   const scaleX = (vpW - PAD * 2) / totalSecW;
   const scaleY = (vpH - PAD * 2.5) / totalSecH;
   const scale = Math.min(scaleX, scaleY);
-  const cx = vpX + vpW / 2, groundY = vpH - PAD * 1.5;
+  const cx = vpX + vpW / 2;
+  const groundY = vpH - PAD * 1.5;
   const toS = (rx: number, ry: number) => ({ x: cx + rx * scale, y: groundY - ry * scale });
   return { ...frame, vpX, vpY: 0, vpW, vpH, scale, cx, groundY, toS };
 }

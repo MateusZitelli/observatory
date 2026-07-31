@@ -1,6 +1,6 @@
 import type { PlanView } from "../types";
 
-export function drawPlanSupports(view: PlanView): void {
+function drawSupportPosts(view: PlanView): void {
   const { ctx, toS, rW, rD, slideLen, scale } = view;
   ctx.strokeStyle = "#4b5563";
   ctx.fillStyle = "#4b5563";
@@ -21,6 +21,11 @@ export function drawPlanSupports(view: PlanView): void {
       postSize * scale, postSize * scale,
     );
   }
+}
+
+function drawSupportCrossbars(view: PlanView): void {
+  const { ctx, toS, rW, rD, slideLen } = view;
+  const railW2 = rW / 2 + 0.04;
   ctx.strokeStyle = "#4b5563";
   ctx.lineWidth = 2;
   ctx.setLineDash([]);
@@ -28,6 +33,11 @@ export function drawPlanSupports(view: PlanView): void {
     const vL = toS(-railW2, zz), vR = toS(railW2, zz);
     ctx.beginPath(); ctx.moveTo(vL.x, vL.y); ctx.lineTo(vR.x, vR.y); ctx.stroke();
   }
+}
+
+export function drawPlanSupports(view: PlanView): void {
+  drawSupportPosts(view);
+  drawSupportCrossbars(view);
 }
 
 export function drawPlanRails(view: PlanView): void {

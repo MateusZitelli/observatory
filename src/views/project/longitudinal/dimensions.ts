@@ -4,7 +4,8 @@ import type { SectionView } from "../types";
 export function drawLongitudinalDimensions(view: SectionView): void {
   const { toS, rD, rH, roofPeakH, WIN_SILL, WIN_TOP, slideLen } = view;
   const wallN_B = toS(-rD / 2, 0), wallS_B = toS(rD / 2, 0), wallS_T = toS(rD / 2, rH);
-  const railStart = toS(-rD / 2, rH), railEnd = toS(-rD / 2 - slideLen, rH);
+  const railStart = toS(-rD / 2, rH);
+  const railEnd = toS(-rD / 2 - slideLen, rH);
   drawDimLine(view, { x1: wallN_B.x, y1: wallN_B.y, x2: wallS_B.x, y2: wallS_B.y, label: rD.toFixed(2) + " m", offset: 22 });
   drawDimLine(view, { x1: wallS_B.x, y1: wallS_B.y, x2: wallS_T.x, y2: wallS_T.y, label: rH.toFixed(2) + " m", offset: 22 });
   const ridgeDimBase = toS(rD / 2 + 0.15, 0), ridgeDimTop = toS(rD / 2 + 0.15, roofPeakH);
